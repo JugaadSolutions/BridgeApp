@@ -1,0 +1,45 @@
+{
+  "port": "2000",
+  "ipAddress": "192.168.1.2",
+  "stationName":"Test Hub",
+  "udp": {
+    "port": 6000,
+    "host": "0.0.0.0"
+  },
+  "serverBridge": {
+    "baseUrl": "http://13.13.13.1:4000/api/"
+  },
+  "db": {
+    "host": "localhost",
+    "port": 27017,
+    "username": "",
+    "password": "",
+    "database": "pbs-bridge"
+  },
+  "security": {
+    "secret": "heisenbergtheking",
+    "enabled": false,
+    "tokenExpiryHours": 2
+  },
+  "encrypt": {
+    "algorithm": "aes-256-ctr",
+    "password": "d6F3Efeq"
+  },
+  "logging": {
+    "general": {
+      "level": "debug",
+      "file": "./logs/general.log"
+    },
+    "error": {
+      "level": "error",
+      "file": "./logs/errors.log"
+    },
+    "event": {
+      "file": "./logs/events.log"
+    }
+  },
+  "testEnv": {
+    "baseUrl": "http://localhost:8000/api",
+    "mainUrl": "http://localhost:8000"
+  }
+}
