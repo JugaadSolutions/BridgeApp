@@ -9,7 +9,8 @@ var abstract = require('./abstract'),
     //ValidationHandler = require('../handlers/validation-handler');
 var autoIncrement = require('mongoose-auto-increment');
 var vehicleIds={
-    vehicleid:{type:Schema.ObjectId,required:false,ref:'vehicle'}
+    vehicleid:{type:Schema.ObjectId,required:false,ref:'vehicle'},
+    vehicleUid:{type:Number,required:false}
 };
 
 const portStats = Constants.AvailabilityStatus;
@@ -18,7 +19,7 @@ var PortSchema = mongoose.Schema({
     PortID : Number,
     portCapacity:{type:Number,required:true,default:1},
     portStatus:{type:portStats,required:true,default:Constants.AvailabilityStatus.EMPTY},
-    vehicleId:{type:[vehicleIds], required:false},
+    vehicleId:{type:[vehicleIds], required:false,default:[]},
     Name:{type:String,required:false}
 
 }, { collection : 'ports', discriminatorKey : '_type' });

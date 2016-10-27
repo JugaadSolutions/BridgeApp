@@ -1,5 +1,8 @@
 module.exports = {
 
+
+    FLEET_FULL:"Fleet is full",
+    RECORD_EXISTS:"Record already exists",
     // User facing messages
     OBTAINING_COUNT_SUCCESSFUL: "Obtaining count successful",
     RECORD_FOR_THIS_ID_DOES_NOT_EXIST: "Record for this ID does not exist",

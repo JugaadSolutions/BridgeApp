@@ -17,15 +17,15 @@ var Schema = mongoose.Schema;
 
 var FleetStatus = Constants.FleetStatus;
 //var name = config.get('fleet.mysore.name');
-const VehicleIds = {
+/*const VehicleIds = {
   vehicleId : {type:Schema.ObjectId,required:false,ref:'Vehicle'}
    // noOfVehicle :{type:Number,required:false}
-};
+};*/
 
 
 var FleetPortSchema = require('mongoose').model('port').schema.extend({
     StationId:{type:Schema.ObjectId, required:false, ref:'Station'},
-    vehicles: {type: [VehicleIds], required: false, default:[]},
+   // vehicles: {type: [VehicleIds], required: false, default:[]},
     timeStamp: {type: Date, required: false, default:Date.now()},
     status:{type:FleetStatus,required:true,default:FleetStatus.WORKING},
     //fleetName:{type:String, required:true},

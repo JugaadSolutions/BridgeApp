@@ -7,11 +7,12 @@ var dgram = require('dgram'),
    // RequestService = require('../app/services/request-service'),
     EventLoggersHandler = require('../app/handlers/event-loggers-handler'),
     udpServer = dgram.createSocket('udp4');
-
+var Parser =require('./parser');
+var eport = require('./eport');
+var portProcessor = require('./port-processing');
+var ports=[];
 var clientHost, clientPort;
-var q = require('./queue');
-var p =require('./parser');
-var i=0;
+
 udpServer.on('error', function (err) {
 
     console.log(err);
@@ -20,49 +21,41 @@ udpServer.on('error', function (err) {
 
 });
 
-var qu = queue(1, function(task, done) {
-    console.log('Message :'+task);
-    done();
+var Queue = queue(1, function(task, done) {
+    eport.printIt(function (res) {
+        console.log(res);
+    });
+    Parser.packetParser(task,function (err,result) {
+        if(err)
+        {
+            console.log('Error Parsing Packet');
+            done();
+            return responseToClient(null, err, clientHost, clientPort);
+
+        }
+         ports = eport;
+        for(var i=0;i<ports.length;i++)
+        {
+            if(ports[i].FPGA==result.FPGA && ports[i].ePortNumber==result.ePortNumber)
+            {
+                //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
+                portProcessor.updatePort(ports[i],result.stepNo,result.data);
+                break;
+            }
+        }
+        done();
+    });
 });
 
 udpServer.on('message', function (message, rinfo) {
-    //console.log('Message Received as : '+message);
-    //console.log('Address : '+rinfo.address+'Port : '+rinfo.port);
 
     message = "" + message; // to convert buffer data into string data type
-    //message = message.toString('hex');
-
-    message = message.toUpperCase();
-
-    EventLoggersHandler.logger.debug("Step " + message.slice(1, 2) + " " + Messages.LOCAL_BRIDGE_RECEIVED + " " + message + " " + "from Hardware");
-
     clientHost = rinfo.address;
     clientPort = rinfo.port;
 
-    //Generic validation
-    if (!message.includes('/') || !message.endsWith('~')) {
+    Queue.push(message);
 
-        // for now just log it
-        console.log("It looks like that's an invalid data packet. Packet Start or End indicator bytes are invalid");
-        //TODO modify the data packet - ie add a proper error code or indication code.
-        return responseToClient(null, message, clientHost, clientPort);
-
-    }
-
-    var startingIndex = message.indexOf('/'),
-        endingIndex = message.lastIndexOf('~');
-
-    var dataFrame = message.slice(startingIndex, endingIndex + 1);
-    EventLoggersHandler.logger.info('From FPGA : '+dataFrame);
-
-    var packetInfo={
-        stepNo:Number(dataFrame[1]),
-        FPGA:Number(dataFrame.slice(2,4)),
-        ePortNumber:Number(dataFrame[4]),
-        data:dataFrame.slice(5,endingIndex)
-    };
-
-    console.log(packetInfo);
+    //pro.processPort();
    // qu.push(mess);
 /*    q.push(mess);
     console.log(q.length);

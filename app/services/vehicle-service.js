@@ -2,7 +2,7 @@ var async = require('async'),
     Vehicle=require('../models/vehicle'),
     mongoose = require('mongoose'),
     Port = require('../models/port'),
-    Fleet = require('../models/fleet'),
+   // Fleet = require('../models/fleet'),
     Messages = require('../core/messages');
 
 exports.addBicycle=function (record, callback) {
@@ -13,17 +13,17 @@ exports.addBicycle=function (record, callback) {
     async.series([
         function (callback) {
             Port.findById(record.fleetId,function (err,result) {
-            if(err)
-            {
-                return callback(err,null);
-            }
+                if(err)
+                {
+                    return callback(err,null);
+                }
 
-            if(result.VehicleCapacity==result.vehicles.length)
-            {
-                return callback(new Error(Messages.FLEET_FULL));
-            }
-            fleetRecord = result;
-            return callback();
+                if(result.VehicleCapacity==result.vehicleId.length)
+                {
+                    return callback(new Error(Messages.FLEET_FULL));
+                }
+                fleetRecord = result;
+                return callback();
             });
         },
         function (callback) {
@@ -31,7 +31,7 @@ exports.addBicycle=function (record, callback) {
                 fleetId:fleetRecord._id,
                 vehicleNumber:record.vehicleNumber,
                 vehicleRFID:record.vehicleRFID,
-                currentAssociationId:fleetRecord
+                currentAssociationId:fleetRecord._id
 
             };
             //record.push(addAssociation);
@@ -49,27 +49,28 @@ exports.addBicycle=function (record, callback) {
             });
         },
         function (callback) {
-        Fleet.findById(vehicleRecord.fleetId,function (err,result) {
-           if(err)
-           {
-               return callback(err,null);
-           }
-           var vehicleDetails={
-               vehicleId:vehicleRecord._id
-           };
-           result.vehicles.push(vehicleDetails);
-            Fleet.findByIdAndUpdate(result._id,result,function (err,result) {
+            Port.findById(vehicleRecord.fleetId,function (err,result) {
                 if(err)
                 {
                     return callback(err,null);
                 }
-                if(!result)
-                {
-                    return callback(new Error(Messages.RECORD_EXISTS));
-                }
-                return callback();
+                var vehicleDetails={
+                    vehicleid:vehicleRecord._id,
+                    vehicleUid:vehicleRecord.vehicleUid
+                };
+                result.vehicleId.push(vehicleDetails);
+                Port.findByIdAndUpdate(result._id,result,function (err,result) {
+                    if(err)
+                    {
+                        return callback(err,null);
+                    }
+                    if(!result)
+                    {
+                        return callback(new Error(Messages.RECORD_EXISTS));
+                    }
+                    return callback();
+                });
             });
-        });
 
         }
 

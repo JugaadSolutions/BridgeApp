@@ -2,6 +2,11 @@
  * Created by root on 4/10/16.
  */
 
+exports.LockStatus={
+    NORMAL:0,
+    JAMMED:1
+};
+
 exports.PayDescription={
     SECURITY_DEPOSIT:"Security Deposit",
     PROCESSING_FEE:"Processing Fee",
@@ -35,6 +40,7 @@ exports.Role={
 };
 
 exports.AvailabilityStatus={
+    ERROR:-1,
     FULL:0,
     EMPTY:1,
     NORMAL:2

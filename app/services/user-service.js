@@ -8,6 +8,17 @@ var Messages = require('../core/messages'),
     config = require('config'),
     User = require('../models/user');
 
+
+/* ************** For Bridge ************************** */
+
+
+
+
+
+
+/* ************** For Bridge ************************** */
+
+
 exports.loginUser = function (loginData, callback) {
 
     var username = loginData.username;

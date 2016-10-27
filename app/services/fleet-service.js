@@ -14,7 +14,10 @@ exports.addFleet=function (record, callback) {
         }
         return callback(null,result);
     });
-*/  Fleet.create(record,function (err,result) {
+
+*/
+    record.portCapacity=record.VehicleCapacity;
+Fleet.create(record,function (err,result) {
     if(err)
     {
         return callback(err,null);

@@ -16,7 +16,7 @@ exports.getPorts = function (callback) {
             return callback(err,null);
         }
         //return callback(null,result);
-        Ports.find({'StationId': res._id},function (err, result) {
+        Ports.find({'StationId': res._id}).lean().exec(function (err, result) {
             if (err) {
                 console.log('Port error');
                 return callback(err,null);

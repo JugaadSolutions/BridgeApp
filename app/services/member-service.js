@@ -3,14 +3,26 @@ var Member = require('../models/member'),
     UploadHandler = require('../handlers/upload-handler'),
     uuid = require('node-uuid'),
     async=require('async'),
-    MembershipService=require('../services/membership-service'),
+    //MembershipService=require('../services/membership-service'),
     PaymentTransaction=require('../services/payment-transaction'),
     Messages = require('../core/messages'),
     Constants =require('../core/constants'),
-    Transaction = require('../models/payment-transactions'),
+    //Transaction = require('../models/payment-transactions'),
     Card = require('../models/card'),
     CardService = require('../services/card-service'),
     User=require('../models/user');
+
+/* ************** For Bridge ************************** */
+
+
+
+
+
+
+/* ************** For Bridge ************************** */
+
+
+
 
 exports.createMember=function (record,callback) {
 

@@ -1,7 +1,7 @@
 {
   "port": "2000",
   "ipAddress": "192.168.1.2",
-  "stationName":"Test Hub",
+  "stationName":"MCC ZONE-2",
   "udp": {
     "port": 6000,
     "host": "0.0.0.0"
