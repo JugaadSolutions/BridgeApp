@@ -3,34 +3,36 @@ var Messages = require('../app/core/messages'),
     EventLoggersHandler = require('../app/handlers/event-loggers-handler');
 
 
-exports.packetParser=function (message,callback) {
-    message = message.toUpperCase();
+exports.packetParser=function (UDPPacketInfo,callback) {
+    UDPPacketInfo.message = UDPPacketInfo.message.toUpperCase();
 
-    EventLoggersHandler.logger.debug("Step " + message.slice(1, 2) + " " + Messages.LOCAL_BRIDGE_RECEIVED + " " + message + " " + "from Hardware");
+    EventLoggersHandler.logger.debug("Step " + UDPPacketInfo.message.slice(1, 2) + " " + Messages.LOCAL_BRIDGE_RECEIVED + " " + UDPPacketInfo.message + " " + "from Hardware");
 
 
 
     //Generic validation
-    if (!message.includes('/') || !message.endsWith('~')) {
+    if (!UDPPacketInfo.message.includes('/') || !UDPPacketInfo.message.endsWith('~')) {
 
         // for now just log it
         console.log("It looks like that's an invalid data packet. Packet Start or End indicator bytes are invalid");
         //TODO modify the data packet - ie add a proper error code or indication code.
         //return responseToClient(null, message, clientHost, clientPort);
-        return callback(new Error(message));
+        return callback(new Error(UDPPacketInfo.message));
     }
 
-    var startingIndex = message.indexOf('/'),
-        endingIndex = message.lastIndexOf('~');
+    var startingIndex = UDPPacketInfo.message.indexOf('/'),
+        endingIndex = UDPPacketInfo.message.lastIndexOf('~');
 
-    var dataFrame = message.slice(startingIndex, endingIndex + 1);
+    var dataFrame = UDPPacketInfo.message.slice(startingIndex, endingIndex + 1);
     EventLoggersHandler.logger.info('From FPGA : '+dataFrame);
 
     var packetInfo={
         stepNo:Number(dataFrame[1]),
         FPGA:Number(dataFrame.slice(2,4)),
         ePortNumber:Number(dataFrame[4]),
-        data:dataFrame
+        data:dataFrame,
+        clientHost:UDPPacketInfo.clientHost,
+        clientPort:UDPPacketInfo.clientPort
     };
 
     //console.log(packetInfo);

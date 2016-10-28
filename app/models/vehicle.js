@@ -16,7 +16,7 @@ var abstract = require('./abstract'),
 //ValidationHandler = require('../handlers/validation-handler');
 //var autoIncrement = require('mongoose-auto-increment');
 
-var status = Constants.VehicleStatus;
+var status = Constants.OperationStatus;
 var vtype = Constants.VehicleType;
 var currentStatus = Constants.VehicleLocationStatus;
 

@@ -41,9 +41,9 @@ exports.Role={
 
 exports.AvailabilityStatus={
     ERROR:-1,
-    FULL:0,
-    EMPTY:1,
-    NORMAL:2
+    FULL:1,
+    EMPTY:2,
+    NORMAL:3
 };
 
 exports.FleetStatus={
@@ -51,9 +51,9 @@ exports.FleetStatus={
     DECOMMISSIONED:-1
 };
 
-exports.VehicleStatus = {
-    OPERATIONAL: 0,
-    NON_OPERATIONAL: 1,
+exports.OperationStatus = {
+    OPERATIONAL: 1,
+    NON_OPERATIONAL: 2,
     DECOMMISSIONED: -1
 };
 
@@ -91,7 +91,8 @@ exports.VehicleLocationStatus={
 };
 exports.DockingStationStatus = {
     OPERATIONAL: 0,
-    NON_OPERATIONAL: 1
+    NON_OPERATIONAL: 1,
+    DECOMMISSIONED: -1
 };
 exports.DockingUnitStatus = {
     OPERATIONAL: 0,

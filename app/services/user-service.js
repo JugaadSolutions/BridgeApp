@@ -2,15 +2,165 @@
  * Created by root on 16/10/16.
  */
 
+var async = require('async'),
+    moment = require('moment');
+
 var Messages = require('../core/messages'),
     _ = require('underscore'),
     jwt = require('jsonwebtoken'),
     config = require('config'),
+    Constants = require('../core/constants'),
+    EventLoggersHandler = require('../handlers/event-loggers-handler'),
     User = require('../models/user');
+var DockingStation = require('../models/dock-station'),
+    UtilsHandler = require('../handlers/utils-handler'),
+    DockingPort = require('../models/dock-port');
 
 
 /* ************** For Bridge ************************** */
 
+exports.checkOutAuthenticationService=function (record,cb) {
+    var command,
+        keyUser;
+    var Ds=0;
+    var Dp=0;
+    var userDetails=0;
+async.series([
+    function (callback) {
+    console.log(record.data.length);
+        if (record.data.length != 43) {
+            EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
+            return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
+        }
+
+        DockingStation.findOne({'ipAddress': config.get('ipAddress')},function (err,result) {
+            if(err)
+            {
+                EventLoggersHandler.logger.error(err);
+                return callback(err, null);
+            }
+            if (!result) {
+                EventLoggersHandler.logger.error(Messages.NO_DOCKING_STATION_FOUND_WITH_THE_IP_ADDRESS + config.get('ipAddress'));
+                return callback(new Error(Messages.NO_DOCKING_STATION_FOUND_WITH_THE_IP_ADDRESS), null);
+            }
+            if (result.operationStatus != Constants.OperationStatus.OPERATIONAL) {
+                EventLoggersHandler.logger.error(Messages.DOCKING_STATION_IS_UNDER_MAINTENANCE, result.name);
+                return callback(new Error(Messages.DOCKING_STATION_IS_UNDER_MAINTENANCE), null);
+            }
+            Ds=result;
+            return callback(null,null);
+        });
+
+    },
+    function (callback) {
+        if(Ds!=0) {
+            var FPGA = record.data.slice(2, 4);
+            var eportNumber = record.data.slice(4, 5);
+
+            DockingPort.findOne({'FPGA': FPGA, 'ePortNumber': eportNumber}, function (err, result) {
+                if (err) {
+                    EventLoggersHandler.logger.error(err);
+                    return callback(err, null);
+                }
+                if (!result) {
+                    EventLoggersHandler.logger.error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + FPGA);
+                    EventLoggersHandler.logger.error(Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER + eportNumber);
+                    return callback(new Error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + " and " + Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER), null);
+                }
+                if (record.portStatus != Constants.AvailabilityStatus.FULL) {
+                    EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE+' OR EMPTY', eportNumber);
+                    return callback(new Error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE+' OR EMPTY'), null);
+                }
+                Dp=result;
+                return callback(null,result);
+            });
+        }
+        else
+        {
+            return callback(null,null);
+        }
+    },
+    function (callback) {
+        if(Dp!=0)
+        {
+            command = record.data[21];
+            if (command != "1") {
+                EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+                return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+            }
+            var userId = record.data.slice(5, 21);
+            User.findOne({'smartCardNumber':userId}).lean().exec(function (err,result) {
+                if(err)
+                {
+                    return callback(err,null);
+                }
+                if (!result) {
+                    EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+                    return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
+                }
+               userDetails=result;
+                return callback(null,result);
+            });
+        }
+        else
+        {
+            return callback(null,null);
+        }
+    },
+    function (callback) {
+        if(userDetails!=0)
+        {
+            if(userDetails._type=='member')
+            {
+                if (!userDetails.status == Constants.MemberStatus.REGISTERED) {
+                    EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                    return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
+                }
+
+                if (userDetails.creditBalance < 5) {
+                    EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                    return callback(new Error("Sorry! You don't have sufficient balance"));
+                }
+                console.log(userDetails.smartCardKey);
+                keyUser = userDetails.smartCardKey;
+                console.log(keyUser);
+                callback(null,null);
+            }
+            else
+            {
+                keyUser = userDetails.smartCardKey;
+                callback(null,null);
+            }
+
+        }
+        else
+        {
+            return callback(null,null);
+        }
+
+    },
+    function (callback) {
+        var stepNumber = 2;
+        var indicatorId = "A";
+        var command = "8";
+
+        record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 1, 2, stepNumber);
+        record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 24, 40, keyUser);
+        record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 22, 23, indicatorId);
+        record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 21, 22, command);
+
+        return callback(null, null);
+    }
+
+],function (err,result) {
+    if(err)
+    {
+        return cb(err,null);
+    }
+    return cb(null,record);
+});
+
+};
 
 
 
@@ -52,7 +202,7 @@ exports.loginUser = function (loginData, callback) {
         }
 
         if (!record.emailVerified) {
-            return callback(new Error(Messages.YOUR_EMAIL_IS_NOT_YET_VERIFIED_PLEASE_VERIFY_BEFORE_LOGGING_IN), null);
+            return callback(new Error('Your Email Is Not Yet Verified'/*Messages.YOUR_EMAIL_IS_NOT_YET_VERIFIED_PLEASE_VERIFY_BEFORE_LOGGING_IN*/), null);
         }
 
         record.comparePassword(password, function (err, isMatch) {

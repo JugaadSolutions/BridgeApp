@@ -5,7 +5,7 @@
 var User = require('../app/services/user-service');
 
 var receivedEport={};
-exports.updatePort = function (eport,stepNo,data) {
+exports.updatePort = function (eport,stepNo,data,callback) {
 
     receivedEport=eport;
     console.log('Update function called with this Eport '+JSON.stringify(receivedEport));
@@ -15,9 +15,17 @@ exports.updatePort = function (eport,stepNo,data) {
     switch (stepNo)
     {
         case 1:
-                   /* User.checkOutAuthenticationService(data,function (err,result) {
-                        
-                    });*/
+                    eport.data = data;
+                    User.checkOutAuthenticationService(eport,function (err,result) {
+                       if(err)
+                       {
+                           return callback(err,null);
+                       }
+                        return callback(null,result);
+                    });
+
+
+
             break;
         case 3:
             break;

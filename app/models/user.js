@@ -25,6 +25,10 @@ const Document = {
     description: {type: String, required: false}
 };
 
+var vehicleIds={
+    vehicleid:{type:Schema.ObjectId,required:false,ref:'vehicle'},
+    vehicleUid:{type:Number,required:false}
+};
 
 var UserSchema = mongoose.Schema({
     UserID : Number,
@@ -48,10 +52,12 @@ var UserSchema = mongoose.Schema({
     profilePic: {type: String, required: false, default: ''},
     cardNum:{type: Number, required: false},
     smartCardNumber: {type: String, required: false},
+    smartCardId: {type: Schema.ObjectId, required: false, ref: 'card'},
+    smartCardKey:{type: String, required: false},
+    vehicleId:{type:[vehicleIds], required:false,default:[]},
     emergencyContact: {type: EmergencyContact, required: false},
     assignedUser: {type: Schema.ObjectId, required: false},
     documents: {type: [Document], required: false}
-
 
 
 }, { collection : 'users', discriminatorKey : '_type' });

@@ -21,16 +21,13 @@ udpServer.on('error', function (err) {
 
 });
 
-var Queue = queue(1, function(task, done) {
-    eport.printIt(function (res) {
-        console.log(res);
-    });
+var RxQueue = queue(1, function(task, done) {
     Parser.packetParser(task,function (err,result) {
         if(err)
         {
             console.log('Error Parsing Packet');
             done();
-            return responseToClient(null, err, clientHost, clientPort);
+           // return responseToClient(null, err, clientHost, clientPort);
 
         }
          ports = eport;
@@ -38,8 +35,17 @@ var Queue = queue(1, function(task, done) {
         {
             if(ports[i].FPGA==result.FPGA && ports[i].ePortNumber==result.ePortNumber)
             {
+                ports[i].clientHost=result.clientHost;
+                ports[i].clientPort=result.clientPort;
                 //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
-                portProcessor.updatePort(ports[i],result.stepNo,result.data);
+                portProcessor.updatePort(ports[i],result.stepNo,result.data,function (err,result) {
+                    if(err)
+                    {
+                        console.log('Error in Port Processing');
+                        done();
+                    }
+                    TxQueue.push(result);
+                });
                 break;
             }
         }
@@ -47,13 +53,36 @@ var Queue = queue(1, function(task, done) {
     });
 });
 
+var TxQueue = queue(1,function (task,done) {
+    console.log('Transmission Packet '+task.data);
+    console.log('Client Host '+task.clientHost);
+    console.log('Client Port '+task.clientPort);
+    EventLoggersHandler.logger.info('From PBS-Bridge : '+JSON.stringify(task));
+    udpServer.send(task.data, 0, task.data.length, task.clientPort, task.clientHost, function (err, bytes) {
+
+        if (err) {
+            throw err;
+        }
+
+        EventLoggersHandler.logger.info("Step " + task.data.slice(1, 2) + " " + Messages.SENDING_RESPONSE_DATA_PACKET + " " + task.data);
+    });
+    done();
+});
+
 udpServer.on('message', function (message, rinfo) {
 
+    var UDPPacketInfo={
+        message:"" + message,
+        clientHost : rinfo.address,
+        clientPort : rinfo.port
+    };
+/*
     message = "" + message; // to convert buffer data into string data type
     clientHost = rinfo.address;
     clientPort = rinfo.port;
+*/
 
-    Queue.push(message);
+    RxQueue.push(UDPPacketInfo);
 
     //pro.processPort();
    // qu.push(mess);
