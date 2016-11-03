@@ -24,7 +24,8 @@ exports.packetParser=function (UDPPacketInfo,callback) {
         endingIndex = UDPPacketInfo.message.lastIndexOf('~');
 
     var dataFrame = UDPPacketInfo.message.slice(startingIndex, endingIndex + 1);
-    EventLoggersHandler.logger.info('From FPGA : '+dataFrame);
+    EventLoggersHandler.logger.info('Step ' + UDPPacketInfo.message.slice(1, 2) + ' Received Packet from-'
+        + UDPPacketInfo.clientHost +':'+UDPPacketInfo.clientPort +"  " +dataFrame);
 
     var packetInfo={
         stepNo:Number(dataFrame[1]),

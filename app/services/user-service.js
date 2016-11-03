@@ -10,6 +10,7 @@ var Messages = require('../core/messages'),
     jwt = require('jsonwebtoken'),
     config = require('config'),
     Constants = require('../core/constants'),
+    Vehicle=require('../models/vehicle'),
     EventLoggersHandler = require('../handlers/event-loggers-handler'),
     User = require('../models/user');
 var DockingStation = require('../models/dock-station'),
@@ -27,7 +28,7 @@ exports.checkOutAuthenticationService=function (record,cb) {
     var userDetails=0;
 async.series([
     function (callback) {
-    console.log(record.data.length);
+    //console.log(record.data.length);
         if (record.data.length != 43) {
             EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
             return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
@@ -121,9 +122,9 @@ async.series([
                     EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
                     return callback(new Error("Sorry! You don't have sufficient balance"));
                 }
-                console.log(userDetails.smartCardKey);
+                //console.log(userDetails.smartCardKey);
                 keyUser = userDetails.smartCardKey;
-                console.log(keyUser);
+                //console.log(keyUser);
                 callback(null,null);
             }
             else
@@ -141,8 +142,8 @@ async.series([
     },
     function (callback) {
         var stepNumber = 2;
-        var indicatorId = "A";
-        var command = "8";
+        var indicatorId = "2";
+        var command = "9";
 
         record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 1, 2, stepNumber);
         record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 24, 40, keyUser);
@@ -162,9 +163,138 @@ async.series([
 
 };
 
+exports.checkOutCommunicationService=function (record,cb) {
 
+    var bicycleCheckOutStatus,
+        keyCycle, command;
 
+    var balance;
+    var userId;
+    async.series([
+        function (callback) {
+            if (record.data.length != 171) {
+                EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKOUT_TRANSACTION_EXPECTING_171_BYTES);
+                return callback(new Error("Sorry! This is an invalid Data Packet for Checkout Transaction. Expecting 171 bytes.", null));
+            }
+            command = record.data[37];
+            if (command != "1") {
+                EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+                return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+            }
+            var bicycleId = record.data.slice(21, 37);
+            Vehicle.findOne({'vehicleRFID':bicycleId},function (err,result) {
+                if(err)
+                {
+                    return callback(err,null);
+                }
+                if (!result) {
+                    EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
+                    return callback(new Error("Sorry! Bicycle with that RFID does not exist or is not available. Contact admin immediately."), null);
+                }
+                if(result.vehicleCurrentStatus!=Constants.VehicleLocationStatus.WITH_PORT)
+                {
+                    EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
+                    return callback(new Error("Sorry! Bicycle with that RFID does not exist or is not available. Contact admin immediately."), null);
+                }
+                record.vehicleRFID = result.vehicleRFID;
+                record.vehicleUid = result.vehicleUid;
+                return callback(null, null);
+            });
+        },
+        function (callback) {
+            userId = record.data.slice(5, 21);
+            User.findOne({'smartCardNumber':userId}).lean().exec(function (err,result) {
+                if(err)
+                {
+                    return callback(err,null);
+                }
+                if (!result) {
+                    EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+                    return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
+                }
+                if(result._type=='member')
+                {
+                   /* var memberBalance = result.creditBalance;
+                    var octalString = exports.generateControlNumber(memberBalance, 4);*/
+                    balance = zeroPad(result.creditBalance,4);
+                    //console.log('Balance : '+balance);
+                    if (!result.status == Constants.MemberStatus.REGISTERED) {
+                        EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                        return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
+                    }
 
+                    if(result.vehicleId.length>0)
+                    {
+                        EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
+                        return callback(new Error("Sorry! It looks like your previous transaction is not completed"));
+                    }
+
+                    if (Number(result.creditBalance) < 5) {
+                        EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                        return callback(new Error("Sorry! You don't have sufficient balance"));
+                    }
+                    //console.log(userDetails.smartCardKey);
+                    //keyUser = userDetails.smartCardKey;
+                    //console.log(keyUser);
+
+                }
+                return callback(null, result);
+            });
+
+        },
+        function (callback) {
+            var stepNumber = 4;
+
+            bicycleCheckOutStatus = 1;
+            command = 9;
+            var userReadData = record.data.slice(56, 88);
+            var indicatorId = 5;
+            var transactionStatus = 1;
+            var checkOutTime = moment().format('DDMMYYhhmm');
+            keyCycle = 'FFFFFFFFFFFF0000';
+
+            record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 1, 2, stepNumber);
+            record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 37, 38, command);
+            userReadData = UtilsHandler.replaceStringWithIndexPosition(userReadData, 0, 5, balance);
+            userReadData = UtilsHandler.replaceStringWithIndexPosition(userReadData, 6, 7, bicycleCheckOutStatus);
+            userReadData = UtilsHandler.replaceStringWithIndexPosition(userReadData, 7, 16, checkOutTime);
+            userReadData = UtilsHandler.replaceStringWithIndexPosition(userReadData, 28, 29, transactionStatus);
+            record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 88, 120, userReadData);
+            record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 120, 136, keyCycle);
+            record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 38, 39, indicatorId);
+
+            record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 56, 88, userReadData);
+
+            record.portStatus= Constants.AvailabilityStatus.EMPTY;
+            record.UserID = userId;
+
+            return callback(null, null);
+        }
+    ],function (err,results) {
+        if(err)
+        {
+            return cb(err,null,record,balance);
+        }
+        return cb(null,record,null);
+    });
+
+};
+
+// Method to generate Octal string
+exports.generateControlNumber = function (number, width) {
+    return new Array(width + 1 - (number + '').length).join('0') + number;
+};
+
+function zeroPad(num, numZeros) {
+    var n = Math.abs(num);
+    var zeros = Math.max(0, numZeros - Math.floor(n).toString().length );
+    var zeroString = Math.pow(10,zeros).toString().substr(1);
+    if( num < 0 ) {
+        zeroString = '-' + zeroString;
+    }
+
+    return zeroString+n;
+}
 
 /* ************** For Bridge ************************** */
 

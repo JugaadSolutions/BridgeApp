@@ -110,7 +110,7 @@ module.exports = {
     // Data Packet Error Messages
     LOCAL_BRIDGE_RECEIVED: "Local Bridge received",
     SENDING_DATA_PACKET: "Sending data packet ",
-    SENDING_RESPONSE_DATA_PACKET: "Sending response Data Packet",
+    SENDING_RESPONSE_DATA_PACKET: "Sending response Data Packet :",
     IT_LOOKS_LIKE_THAT_AN_INVALID_DATA_PACKET_UNIDENTIFIED_STEP_NUMBER_FOUND_IN_THE_PACKET: "It looks like that's an invalid data packet. Unidentified step number found in the packet.",
     THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES: "This is an invalid Data Packet for User Authentication. Expecting 42 bytes.",
     THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKOUT_TRANSACTION_EXPECTING_171_BYTES: "This is an invalid Data Packet for Checkout Transaction. Expecting 171 bytes.",

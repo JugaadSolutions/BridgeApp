@@ -15,7 +15,6 @@ var DockStationSchema = require('mongoose').model('station').schema.extend({
     name:{type:String,required:false,unique:true},
     ipAddress:{type:String,required:false,unique:true},
     stationStatus:{type:stationStats,required:false,default:stationStats.EMPTY},
-    //operationStatus:{type:status,required:false,default:status.OPERATIONAL},
     stationNumber:{type:String,required:false},
     noofUnits:{type:Number,required:false},
     noofPorts:{type:Number,required:false},

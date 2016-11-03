@@ -6,6 +6,7 @@ var dgram = require('dgram'),
     Messages = require('../app/core/messages'),
    // RequestService = require('../app/services/request-service'),
     EventLoggersHandler = require('../app/handlers/event-loggers-handler'),
+    LocalUpdaterService = require('../app/services/localupdate-service'),
     udpServer = dgram.createSocket('udp4');
 var Parser =require('./parser');
 var eport = require('./eport');
@@ -18,6 +19,20 @@ udpServer.on('error', function (err) {
     console.log(err);
     // TODO
     //server.close();// no need to close
+
+});
+
+var UpdateQueue = queue(1,function (task, done) {
+
+    LocalUpdaterService.updateDB(task,function (err,result) {
+        if(err)
+        {
+            console.log('Error Updating Record');
+            done();
+        }
+        console.log('Updation Successful :'+result);
+        done();
+    });
 
 });
 
@@ -45,6 +60,7 @@ var RxQueue = queue(1, function(task, done) {
                         done();
                     }
                     TxQueue.push(result);
+                    UpdateQueue.push(result);
                 });
                 break;
             }
@@ -53,11 +69,13 @@ var RxQueue = queue(1, function(task, done) {
     });
 });
 
+//var
+
 var TxQueue = queue(1,function (task,done) {
-    console.log('Transmission Packet '+task.data);
-    console.log('Client Host '+task.clientHost);
-    console.log('Client Port '+task.clientPort);
-    EventLoggersHandler.logger.info('From PBS-Bridge : '+JSON.stringify(task));
+   // console.log('Transmission Packet '+task.data);
+    //console.log('Client Host '+task.clientHost);
+    //console.log('Client Port '+task.clientPort);
+    //EventLoggersHandler.logger.info('From PBS-Bridge : '+JSON.stringify(task));
     udpServer.send(task.data, 0, task.data.length, task.clientPort, task.clientHost, function (err, bytes) {
 
         if (err) {
