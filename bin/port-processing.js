@@ -85,6 +85,15 @@ exports.updatePort = function (eport,stepNo,data,callback) {
         case 6:
             break;
         case 7:
+            eport.data = data;
+            User.checkInCommunicationService(eport,function (err,result) {
+                if(err)
+                {
+                    return callback(err,null);
+
+                }
+                return callback(null,result);
+            });
             break;
         case 9:
             break;

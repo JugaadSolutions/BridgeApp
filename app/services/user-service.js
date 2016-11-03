@@ -280,6 +280,63 @@ exports.checkOutCommunicationService=function (record,cb) {
 
 };
 
+exports.checkInCommunicationService = function (eport, cb) {
+
+    var vehicle;
+    async.series([
+
+            // Step 1 Validation
+            function (callback) {
+
+                if (eport.data.length != 26) {
+                    EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKIN_TRANSACTION_EXPECTING_26_BYTES);
+                    return callback(new Error("Sorry! This is an invalid Data Packet for CheckIn Transaction. Expecting 26 bytes.", null));
+                }
+
+                var bicycleId = eport.data.slice(5, 21);
+
+                Vehicle.findOne({vehicleRFID: bicycleId, vehicleCurrentStatus: Constants.VehicleLocationStatus.WITH_MEMBER, vehicleStatus:Constants.OperationStatus.OPERATIONAL}, function (err, result) {
+
+                    if (err) {
+                        return callback(err, null);
+                    }
+
+                    if (!result) {
+                        EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
+                        return callback(new Error("Sorry! Bicycle with that RFID does not exist."), null);
+                    }
+                    eport.vehicleRFID = result.vehicleRFID;
+                    eport.vehicleUid = result.vehicleUid;
+
+                    vehicle = result;
+                    return callback(null, null);
+
+                });
+
+            },
+
+            // Step 2 update the packet
+            function (callback) {
+
+
+
+                return callback(null, null);
+
+            }
+
+        ],
+        function (err, results) {
+
+            if (err) {
+                return cb(err, null, dataFrame)
+            }
+
+            return cb(null, null, dataFrame);
+
+        });
+
+};
+
 // Method to generate Octal string
 exports.generateControlNumber = function (number, width) {
     return new Array(width + 1 - (number + '').length).join('0') + number;
