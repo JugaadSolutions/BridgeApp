@@ -43,7 +43,7 @@
     "node-require-directory": "^1.0.2",
     "node-schedule": "^1.1.0",
     "node-uuid": "^1.4.7",
-    "request": "^2.69.0",
+    "request": "^2.78.0",
     "serve-favicon": "~2.3.0",
     "swig": "^1.4.2",
     "to-iso-string": "0.0.2",

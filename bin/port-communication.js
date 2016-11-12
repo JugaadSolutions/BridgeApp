@@ -30,7 +30,25 @@ var UpdateQueue = queue(1,function (task, done) {
             console.log('Error Updating Record');
             done();
         }
-        console.log('Updation Successful :'+result);
+        var time= 3000;
+        var msg='Checkin Successful';
+        if(result.checkOutTime)
+        {
+            time=4995;
+            msg='Checkout Successful';
+        }
+        setTimeout(function () {
+            var unit = result.fpga;
+            var port = result.port;
+            var data= '/A0'+unit+port+'100000000000~';
+            var transactionPacket = {
+                data:data,
+                clientPort: result.clientPort,
+                clientHost: result.clientHost
+            };
+            TxQueue.push(transactionPacket);
+        },time);
+        console.log('Updation Successful :'+msg);
         done();
     });
 
@@ -54,19 +72,85 @@ var RxQueue = queue(1, function(task, done) {
                 ports[i].clientPort=result.clientPort;
                 //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
                 portProcessor.updatePort(ports[i],result.stepNo,result.data,function (err,result) {
+
                     if(err)
                     {
                         console.log('Error in Port Processing');
                         done();
+                        return;
                     }
-                    TxQueue.push(result);
-                    UpdateQueue.push(result);
+                    if(result.data[1]!=7) {
+                        var transactionPacket = {
+                            data: result.data,
+                            clientPort: result.clientPort,
+                            clientHost: result.clientHost
+                        };
+                        TxQueue.push(transactionPacket);
+                    }
+                    else
+                    {
+                        //eport.data='/A051030000000000~';
+                        var temp = result.data.slice(2,5);
+                        var newdata='/A'+temp+'900000000000~';
+                        var transactionPacket = {
+                            data: newdata,
+                            clientPort: result.clientPort,
+                            clientHost: result.clientHost
+                        };
+                        TxQueue.push(transactionPacket);
+                    }
+                    if(result.data[1]==4 || result.data[1]==7)
+                    {
+                        var updateObj={};
+                        if(result.data[1]==4)
+                        {
+                            var obj={
+                                type:'checkout',
+                                PortID:result.PortID,
+                                FPGA:result.FPGA,
+                                ePortNumber:result.ePortNumber,
+                                UserID:result.UserID,
+                                cardRFID:result.cardRFID,
+                                vehicleid:result.vehicleid,
+                                vehicleRFID:result.vehicleRFId,
+                                vehicleUid:result.vehicleUid,
+                                portStatus:result.portStatus,
+                                clientPort: result.clientPort,
+                                clientHost: result.clientHost
+                            };
+
+                            updateObj=obj;
+
+                        }
+                        else
+                        {
+                            var obj={
+                                type:'checkin',
+                                PortID:result.PortID,
+                                FPGA:result.FPGA,
+                                ePortNumber:result.ePortNumber,
+                                UserID:result.UserID,
+                                cardRFID:result.cardRFID,
+                                vehicleRFId:result.vehicleRFId,
+                                vehicleUid:result.vehicleUid,
+                                portStatus:result.portStatus,
+                                clientPort: result.clientPort,
+                                clientHost: result.clientHost
+                            };
+
+                            updateObj=obj;
+                        }
+                        UpdateQueue.push(updateObj);
+                       // done();
+                    }
+
                 });
                 break;
             }
         }
-        done();
+
     });
+    done();
 });
 
 //var
@@ -139,7 +223,7 @@ udpServer.bind({
 });
 
 
-function responseToClient(err, message, host, port, updateServer) {
+/*function responseToClient(err, message, host, port, updateServer) {
 
     var stepNumber = message[1];
     var portNumber = message[4];
@@ -193,4 +277,28 @@ function responseToClient(err, message, host, port, updateServer) {
 
         }
     }
-}
+}*/
+/*
+var units=['04','05'];
+var unitClientHost=['192.168.1.4','192.168.1.5'];
+var unitIndex=0;
+setInterval(function () {
+    //EventLoggersHandler.logger.info(Messages.CHECKOUT_VERIFICATION_INITIATED + datapacket.slice(2, 4));
+    console.log('Checkin Timed out');
+    //isCheckinVerification = true;
+    var packetArray = [];
+
+    var packet = '/5' + units[unitIndex] + '8100000000000~';
+
+    packetArray.push(packet);
+    console.log('Packet array '+packetArray);
+
+    ReportService.checkBicycleAvailability(packetArray, unitClientHost[unitIndex]);
+    unitIndex=unitIndex+1;
+    if(unitIndex>1)
+    {
+        unitIndex=0;
+    }
+
+}, 5000);*/
+//require('./serverbridge');

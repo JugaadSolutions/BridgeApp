@@ -83,6 +83,8 @@ exports.updatePort = function (eport,stepNo,data,callback) {
 
             break;
         case 6:
+            eport.data = data;
+                    return callback(null,eport);
             break;
         case 7:
             eport.data = data;
@@ -96,6 +98,15 @@ exports.updatePort = function (eport,stepNo,data,callback) {
             });
             break;
         case 9:
+            eport.data = data;
+            if (eport.data[5] != "C") {
+                User.errorHandler(eport, function (err, result) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    return callback(null, result);
+                });
+            }
             break;
     }
 };

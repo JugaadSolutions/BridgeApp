@@ -34,7 +34,7 @@ var VehicleSchema = mongoose.Schema({
     vehicleStatus:{type:status,required:true,default:status.OPERATIONAL},
     vehicleCurrentStatus:{type:currentStatus,required:true,default:currentStatus.WITH_PORT},
     /*currentAssociationId:{type:[AssociationIds], required:false,default:[]}*/
-    currentAssociationId:{type:Schema.ObjectId, required:false,ref:'port'||'user'}
+    currentAssociationId:{type:Schema.ObjectId, required:false}
 
 }, { collection : 'vehicles'});
 

@@ -28,6 +28,26 @@ exports.checkOutAuthenticationService=function (record,cb) {
     var userDetails=0;
 async.series([
     function (callback) {
+        command = record.data[21];
+        if (command != "1") {
+            EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+            return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+        }
+        var userIds = record.data.slice(5, 21);
+        User.findOne({'smartCardNumber':userIds}).lean().exec(function (err,result) {
+            if(err)
+            {
+                return callback(err,null);
+            }
+            if (!result) {
+                EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+                return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
+            }
+            userDetails=result;
+            return callback(null,result);
+        });
+    },
+    function (callback) {
     //console.log(record.data.length);
         if (record.data.length != 43) {
             EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
@@ -80,7 +100,7 @@ async.series([
         {
             return callback(null,null);
         }
-    },
+    }/*,
     function (callback) {
         if(Dp!=0)
         {
@@ -89,8 +109,8 @@ async.series([
                 EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
                 return callback(new Error("Sorry! It looks like you tapped on an open port", null));
             }
-            var userId = record.data.slice(5, 21);
-            User.findOne({'smartCardNumber':userId}).lean().exec(function (err,result) {
+            var userIds = record.data.slice(5, 21);
+            User.findOne({'smartCardNumber':userIds}).lean().exec(function (err,result) {
                 if(err)
                 {
                     return callback(err,null);
@@ -107,7 +127,7 @@ async.series([
         {
             return callback(null,null);
         }
-    },
+    }*/,
     function (callback) {
         if(userDetails!=0)
         {
@@ -170,6 +190,7 @@ exports.checkOutCommunicationService=function (record,cb) {
 
     var balance;
     var userId;
+    var userDetails;
     async.series([
         function (callback) {
             if (record.data.length != 171) {
@@ -198,7 +219,8 @@ exports.checkOutCommunicationService=function (record,cb) {
                 }
                 record.vehicleRFID = result.vehicleRFID;
                 record.vehicleUid = result.vehicleUid;
-                return callback(null, null);
+                record.vehicleid=result._id;
+                return callback(null, result);
             });
         },
         function (callback) {
@@ -236,7 +258,9 @@ exports.checkOutCommunicationService=function (record,cb) {
                     //console.log(userDetails.smartCardKey);
                     //keyUser = userDetails.smartCardKey;
                     //console.log(keyUser);
-
+                    userDetails = result;
+                    record.UserID=result.UserID;
+                    record.cardRFID=result.smartCardNumber;
                 }
                 return callback(null, result);
             });
@@ -266,8 +290,6 @@ exports.checkOutCommunicationService=function (record,cb) {
             record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 56, 88, userReadData);
 
             record.portStatus= Constants.AvailabilityStatus.EMPTY;
-            record.UserID = userId;
-
             return callback(null, null);
         }
     ],function (err,results) {
@@ -282,7 +304,7 @@ exports.checkOutCommunicationService=function (record,cb) {
 
 exports.checkInCommunicationService = function (eport, cb) {
 
-    var vehicle;
+    var vehicleDetails;
     async.series([
 
             // Step 1 Validation
@@ -294,8 +316,9 @@ exports.checkInCommunicationService = function (eport, cb) {
                 }
 
                 var bicycleId = eport.data.slice(5, 21);
+                //console.log('Packet data(bicycleId) - '+bicycleId);
 
-                Vehicle.findOne({vehicleRFID: bicycleId, vehicleCurrentStatus: Constants.VehicleLocationStatus.WITH_MEMBER, vehicleStatus:Constants.OperationStatus.OPERATIONAL}, function (err, result) {
+                Vehicle.findOne({'vehicleRFID': bicycleId/*, vehicleCurrentStatus: Constants.VehicleLocationStatus.WITH_MEMBER*/, 'vehicleStatus':Constants.OperationStatus.OPERATIONAL}, function (err, result) {
 
                     if (err) {
                         return callback(err, null);
@@ -307,18 +330,89 @@ exports.checkInCommunicationService = function (eport, cb) {
                     }
                     eport.vehicleRFID = result.vehicleRFID;
                     eport.vehicleUid = result.vehicleUid;
-
-                    vehicle = result;
-                    return callback(null, null);
+                    eport.vehicleid=result._id;
+                    eport.portStatus= Constants.AvailabilityStatus.FULL;
+                    vehicleDetails = result;
+                    return callback(null, result);
 
                 });
 
             },
+        function (callback) {
+            //var indicatorId = 3;
+            User.findOne({'_id':vehicleDetails.currentAssociationId}).lean().exec(function (err,result) {
+                if(err)
+                {
+                    return callback(err,null);
+                }
+                eport.UserID=result.UserID;
+                eport.cardRFID=result.smartCardNumber;
+                return callback(null,result);
+            });
+        }
+/*          ,
 
             // Step 2 update the packet
             function (callback) {
 
+               /!* var stepNumber = 8;
+                var indicatorId = "3";
+                var command = "8";
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 1, 2, stepNumber);
+                eport.data= UtilsHandler.replaceStringWithIndexPosition(eport.data, 23, 24, indicatorId);
+                eport.data= UtilsHandler.replaceStringWithIndexPosition(eport.data, 21, 22, command);
+*!/
+                //eport.data='/A051000000000000~';
+                var stepNumber = 'A';
+                var indicatorId = 3;
+                var command = "0";
+                var data = "00000000";
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 5, 21, data);
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 1, 2, stepNumber);
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 5, 6, command);
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 6, 7, indicatorId);
 
+                return callback(null, null);
+
+            }*/
+
+        ],
+        function (err, results) {
+
+            if (err) {
+                return cb(err, eport)
+            }
+
+            return cb(null, eport);
+
+        });
+
+};
+
+exports.errorHandler = function (eport,cb) {
+    async.series([
+
+            // Step 1: Method to validate packet
+            function (callback) {
+
+                if (eport.data.length != 18) {
+                    EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_EXPECTING_18_BYTES);
+                    return callback(new Error("Sorry! This is an invalid Data Packet. Expecting 18 bytes.", null));
+                }
+
+                return callback(null, null);
+
+            },
+
+            // Step 2: Method to update packet
+            function (callback) {
+
+                var stepNumber = 'A';
+                var indicatorId = 0;
+                var command = "0";
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 1, 2, stepNumber);
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 5, 6, command);
+                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 6, 7, indicatorId);
 
                 return callback(null, null);
 
@@ -328,15 +422,13 @@ exports.checkInCommunicationService = function (eport, cb) {
         function (err, results) {
 
             if (err) {
-                return cb(err, null, dataFrame)
+                return cb(err, eport)
             }
 
-            return cb(null, null, dataFrame);
+            return cb(null, eport);
 
         });
-
 };
-
 // Method to generate Octal string
 exports.generateControlNumber = function (number, width) {
     return new Array(width + 1 - (number + '').length).join('0') + number;

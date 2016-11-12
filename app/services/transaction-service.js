@@ -88,7 +88,7 @@ exports.checkout=function (record,callback) {
 
     async.series([
         function (callback) {
-            Member.findOne({'smartCardNumber':record.cardId},function (err,result) {
+           /* Member.findOne({'smartCardNumber':record.cardId},function (err,result) {
             if(err)
             {
                 errorstatus=1;
@@ -178,7 +178,7 @@ exports.checkout=function (record,callback) {
                     errorStatus:errorstatus,
                     errorMsg:errormsg
                 };
-            }
+            }*/
             CheckOut.create(checkoutDetails, function (err, result) {
                 if (err) {
                     return callback(err, null);
@@ -187,7 +187,7 @@ exports.checkout=function (record,callback) {
                 return callback(null, result);
             });
         }
-        ,
+       /* ,
         function (callback) {
             Port.findById(vehiclesDetails.currentAssociationId,function (err,result) {
                 if(err)
@@ -201,15 +201,15 @@ exports.checkout=function (record,callback) {
                     return callback(null,null);
                 }
                 //if(result.portType=='dock-port'){
-                /*    vehicleLocationStatus = Constants.VehicleLocationStatus.WITH_FLEET;
-                }else {*/
+                /!*    vehicleLocationStatus = Constants.VehicleLocationStatus.WITH_FLEET;
+                }else {*!/
                     vehicleLocationStatus = Constants.VehicleLocationStatus.WITH_PORT;
                 //}
 
                 return callback(null,result);
             });
         }
-        ,
+        ,*/
        /* function (callback) {
             if(vehicleLocationStatus==Constants.VehicleLocationStatus.WITH_FLEET || vehicleLocationStatus==Constants.VehicleLocationStatus.WITH_PORT)
             {
@@ -228,6 +228,7 @@ exports.checkout=function (record,callback) {
             }
 
         },*/
+/*
 
         function (callback) {
             if(errorstatus==0) {
@@ -244,6 +245,7 @@ exports.checkout=function (record,callback) {
                 });
             }
         }
+*/
 
         
     ],function (err,result) {
