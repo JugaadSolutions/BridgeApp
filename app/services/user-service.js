@@ -337,7 +337,7 @@ exports.checkInCommunicationService = function (eport, cb) {
 
                 });
 
-            },
+            }/*,
         function (callback) {
             //var indicatorId = 3;
             User.findOne({'_id':vehicleDetails.currentAssociationId}).lean().exec(function (err,result) {
@@ -349,7 +349,7 @@ exports.checkInCommunicationService = function (eport, cb) {
                 eport.cardRFID=result.smartCardNumber;
                 return callback(null,result);
             });
-        }
+        }*/
 /*          ,
 
             // Step 2 update the packet

@@ -8,6 +8,7 @@ var async = require('async'),
     CheckOut = require('../models/checkout'),
     CheckIn = require('../models/checkin'),
     EventLoggersHandler = require('../handlers/event-loggers-handler'),
+    Messages = require('../core/messages'),
     Transaction = require('../services/transaction-service'),
     User = require('../models/user');
 
@@ -41,37 +42,40 @@ exports.updateDB = function (record,cb) {
         },
         function(callback)
         {
-            User.findOne({'smartCardNumber':record.cardRFID}).lean().exec(function (err,result) {
-                if(err)
-                {
-                    return callback(err,null);
-                }
-                if(!result)
-                {
-                    EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
-                    return callback(new Error("Sorry! User with that RFID does not exist."), null);
-                }
-                if(record.type=='checkout') {
-                    var vehicleDetails = {
-                        vehicleid: vehicleData._id,
-                        vehicleUid: record.vehicleUid
-
-                    };
-                    result.vehicleId.push(vehicleDetails);
-                }
-                if(record.type=='checkin'){
-                    result.vehicleId=[];
-                }
-                User.findByIdAndUpdate(result._id,result,{new:true},function (err,result) {
-                    if(err)
-                    {
-                        return callback(err,null);
+            if(record.cardRFID) {
+                User.findOne({'smartCardNumber': record.cardRFID}).lean().exec(function (err, result) {
+                    if (err) {
+                        return callback(err, null);
                     }
-                    userUpdatedDetails=result;
-                });
+                    if (!result) {
+                        EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+                        return callback(new Error("Sorry! User with that RFID does not exist."), null);
+                    }
+                    if (record.type == 'checkout') {
+                        var vehicleDetails = {
+                            vehicleid: vehicleData._id,
+                            vehicleUid: record.vehicleUid
 
-                return callback(null,result);
-            });
+                        };
+                        result.vehicleId.push(vehicleDetails);
+                    }
+                    if (record.type == 'checkin') {
+                        result.vehicleId = [];
+                    }
+                    User.findByIdAndUpdate(result._id, result, {new: true}, function (err, result) {
+                        if (err) {
+                            return callback(err, null);
+                        }
+                        userUpdatedDetails = result;
+                    });
+
+                    return callback(null, result);
+                });
+            }
+            else
+            {
+                return callback(null,null);
+            }
 
         },
         function (callback) {
@@ -82,8 +86,8 @@ exports.updateDB = function (record,cb) {
                 }
                 if(!result)
                 {
-                        EventLoggersHandler.logger.error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + FPGA);
-                        EventLoggersHandler.logger.error(Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER + eportNumber);
+                        EventLoggersHandler.logger.error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + record.FPGA);
+                        EventLoggersHandler.logger.error(Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER +record.ePortNumber);
                         return callback(new Error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + " and " + Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER), null);
                 }
                 result.portStatus = record.portStatus;
@@ -172,12 +176,20 @@ exports.updateDB = function (record,cb) {
             }
             if(record.type=='checkin')
             {
-                var transDetails = {
-                    user:userUpdatedDetails.UserID,
-                    vehicleId:vehicleData.vehicleUid,
-                    toPort:portUpdatedDetails.PortID//,
-                    //checkOutTime:Date.now
-                };
+                if(userUpdatedDetails.UserID) {
+                    var transDetails = {
+                        user: userUpdatedDetails.UserID,
+                        vehicleId: vehicleData.vehicleUid,
+                        toPort: portUpdatedDetails.PortID//,
+                        //checkOutTime:Date.now
+                    };
+                }else {
+                    var transDetails = {
+                        vehicleId: vehicleData.vehicleUid,
+                        toPort: portUpdatedDetails.PortID//,
+                        //checkOutTime:Date.now
+                    };
+                }
                 /*Transaction.checkout(transDetails,function (err,result) {
                  if(err)
                  {

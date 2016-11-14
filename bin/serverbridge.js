@@ -13,9 +13,28 @@ upload.uploader(function (err,result) {
     if(err)
     {
         console.log('Error');
+        //return;
+    }
+
+/*
+setTimeout(function () {*/
+   /*
+},10000);*/
+    console.log('Upload checkout success');
+
+
+});
+
+},10000);
+
+setInterval(function () {
+    console.log('Timeout');
+upload.Checkinuploader(function (err,result) {
+    if(err)
+    {
+        console.log('Error');
         return;
     }
-    console.log('Upload success');
-})
-
-},15000);
+    console.log('Upload checkin success');
+});
+},30000);

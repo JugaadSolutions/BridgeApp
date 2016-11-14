@@ -9008,3 +9008,364 @@ Use mongoose.model(name, schema) date=Tue Nov 08 2016 18:25:42 GMT+0530 (IST), p
     at exports._errnoException (util.js:1012:11)
     at TCP.onread (net.js:563:26)
 2016-11-11T17:52:33.220Z - error: uncaughtException: Callback was already called. date=Fri Nov 11 2016 23:22:33 GMT+0530 (IST), pid=24145, uid=1000, gid=1000, cwd=/home/green/Desktop/BridgeApp, execPath=/usr/local/bin/node, version=v6.3.1, argv=[/usr/local/bin/node, /home/green/Desktop/BridgeApp/server.js], rss=73740288, heapTotal=50315264, heapUsed=41674536, loadavg=[0.154296875, 0.12939453125, 0.2607421875], uptime=273240, trace=[column=36, file=/home/green/Desktop/BridgeApp/node_modules/async/lib/async.js, function=null, line=43, method=null, native=false, column=17, file=/home/green/Desktop/BridgeApp/node_modules/async/lib/async.js, function=null, line=723, method=null, native=false, column=37, file=/home/green/Desktop/BridgeApp/node_modules/async/lib/async.js, function=null, line=167, method=null, native=false, column=35, file=/home/green/Desktop/BridgeApp/bin/upload-service.js, function=null, line=66, method=null, native=false, column=24, file=/home/green/Desktop/BridgeApp/app/services/request-service.js, function=Request._callback, line=29, method=_callback, native=false, column=22, file=/home/green/Desktop/BridgeApp/node_modules/request/request.js, function=self.callback, line=186, method=callback, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=Request.emit, line=188, method=emit, native=false, column=8, file=/home/green/Desktop/BridgeApp/node_modules/request/request.js, function=Request.onRequestError, line=845, method=onRequestError, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=ClientRequest.emit, line=188, method=emit, native=false, column=9, file=_http_client.js, function=Socket.socketErrorListener, line=308, method=socketErrorListener, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=Socket.emit, line=188, method=emit, native=false, column=8, file=net.js, function=emitErrorNT, line=1271, method=null, native=false, column=11, file=internal/process/next_tick.js, function=_combinedTickCallback, line=74, method=null, native=false, column=9, file=internal/process/next_tick.js, function=process._tickCallback, line=98, method=_tickCallback, native=false], stack=[Error: Callback was already called.,     at /home/green/Desktop/BridgeApp/node_modules/async/lib/async.js:43:36,     at /home/green/Desktop/BridgeApp/node_modules/async/lib/async.js:723:17,     at /home/green/Desktop/BridgeApp/node_modules/async/lib/async.js:167:37,     at /home/green/Desktop/BridgeApp/bin/upload-service.js:66:35,     at Request._callback (/home/green/Desktop/BridgeApp/app/services/request-service.js:29:24),     at self.callback (/home/green/Desktop/BridgeApp/node_modules/request/request.js:186:22),     at emitOne (events.js:96:13),     at Request.emit (events.js:188:7),     at Request.onRequestError (/home/green/Desktop/BridgeApp/node_modules/request/request.js:845:8),     at emitOne (events.js:96:13),     at ClientRequest.emit (events.js:188:7),     at Socket.socketErrorListener (_http_client.js:308:9),     at emitOne (events.js:96:13),     at Socket.emit (events.js:188:7),     at emitErrorNT (net.js:1271:8),     at _combinedTickCallback (internal/process/next_tick.js:74:11),     at process._tickCallback (internal/process/next_tick.js:98:9)]
+2016-11-12T04:14:20.434Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:14:35.433Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:14:37.693Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T04:14:37.697Z - error:  Error: read ECONNRESET
+    at exports._errnoException (util.js:1012:11)
+    at TCP.onread (net.js:563:26)
+2016-11-12T04:14:50.436Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:14:50.440Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:15:05.440Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:15:05.443Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:15:20.442Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:15:20.447Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:15:35.441Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:15:35.442Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:15:50.442Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:15:50.443Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:16:05.445Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:16:05.446Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:16:20.449Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:16:20.450Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:53:46.702Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:54:01.690Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:54:16.693Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:54:19.938Z - error:  Error: read ECONNRESET
+    at exports._errnoException (util.js:1012:11)
+    at TCP.onread (net.js:563:26)
+2016-11-12T04:54:19.943Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T04:54:19.945Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T04:54:31.696Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:54:31.702Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:54:46.694Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:54:46.695Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:55:01.703Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:55:01.707Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:55:16.703Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:55:16.705Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:55:31.704Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:55:31.705Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:55:46.706Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:55:46.707Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:56:01.709Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:56:01.710Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:56:16.710Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:56:16.711Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:57:52.894Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T04:57:52.913Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T04:58:50.874Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T05:00:13.858Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T05:00:13.860Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T05:00:19.892Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T05:00:30.936Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T05:00:30.939Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T06:25:20.947Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:26:05.219Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T06:26:23.274Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:26:23.277Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T06:27:31.295Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:27:31.296Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T06:28:26.284Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:28:26.285Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T06:29:24.278Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:30:24.291Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:32:57.382Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:32:57.413Z - error: uncaughtException: connection timeout date=Sat Nov 12 2016 12:02:57 GMT+0530 (IST), pid=29993, uid=0, gid=0, cwd=/home/gwr-5/Desktop/BridgeApp, execPath=/opt/node-v6.3.1-linux-x64/bin/node, version=v6.3.1, argv=[/opt/node-v6.3.1-linux-x64/bin/node, /home/gwr-5/Desktop/BridgeApp/server.js], rss=67674112, heapTotal=38780928, heapUsed=32220288, loadavg=[0.234375, 0.31494140625, 0.25244140625], uptime=142085, trace=[column=17, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js, function=.<anonymous>, line=168, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js, function=listener, line=1791, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js, function=.<anonymous>, line=270, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js, function=.<anonymous>, line=322, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js, function=.<anonymous>, line=271, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=10, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js, function=, line=175, method=null, native=false, column=16, file=events.js, function=Socket.g, line=286, method=g, native=false, column=13, file=events.js, function=emitNone, line=86, method=null, native=false, column=7, file=events.js, function=Socket.emit, line=185, method=emit, native=false, column=8, file=net.js, function=Socket._onTimeout, line=333, method=_onTimeout, native=false], stack=[Error: connection timeout,     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js:168:17),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at listener (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js:1791:14),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js:270:14),     at g (events.js:286:16),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js:322:12),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js:271:12),     at g (events.js:286:16),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at Socket.<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js:175:10),     at Socket.g (events.js:286:16),     at emitNone (events.js:86:13),     at Socket.emit (events.js:185:7),     at Socket._onTimeout (net.js:333:8)]
+2016-11-12T06:47:08.118Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T06:54:36.421Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:03:58.769Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:05:23.762Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:05:23.768Z - error:  Error: read ECONNRESET
+    at exports._errnoException (util.js:1012:11)
+    at TCP.onread (net.js:563:26)
+2016-11-12T07:08:24.038Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:09:19.137Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:09:19.157Z - error: uncaughtException: connection timeout date=Sat Nov 12 2016 12:39:19 GMT+0530 (IST), pid=32232, uid=0, gid=0, cwd=/home/gwr-5/Desktop/BridgeApp, execPath=/opt/node-v6.3.1-linux-x64/bin/node, version=v6.3.1, argv=[/opt/node-v6.3.1-linux-x64/bin/node, /home/gwr-5/Desktop/BridgeApp/server.js], rss=64729088, heapTotal=37732352, heapUsed=31861976, loadavg=[0.3251953125, 0.32763671875, 0.26904296875], uptime=144267, trace=[column=17, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js, function=.<anonymous>, line=168, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js, function=listener, line=1791, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js, function=.<anonymous>, line=270, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js, function=.<anonymous>, line=322, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js, function=.<anonymous>, line=271, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=10, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js, function=, line=175, method=null, native=false, column=16, file=events.js, function=Socket.g, line=286, method=g, native=false, column=13, file=events.js, function=emitNone, line=86, method=null, native=false, column=7, file=events.js, function=Socket.emit, line=185, method=emit, native=false, column=8, file=net.js, function=Socket._onTimeout, line=333, method=_onTimeout, native=false], stack=[Error: connection timeout,     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js:168:17),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at listener (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js:1791:14),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js:270:14),     at g (events.js:286:16),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js:322:12),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js:271:12),     at g (events.js:286:16),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at Socket.<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js:175:10),     at Socket.g (events.js:286:16),     at emitNone (events.js:86:13),     at Socket.emit (events.js:185:7),     at Socket._onTimeout (net.js:333:8)]
+2016-11-12T07:12:04.732Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:12:04.749Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T07:13:04.720Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:13:04.728Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13055
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T07:14:04.723Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:15:04.726Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:16:04.733Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:17:04.734Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:18:04.740Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:19:04.742Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:20:04.750Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:21:04.750Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:22:04.756Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:23:04.757Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:24:04.758Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:25:04.761Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:26:04.767Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:27:04.771Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:28:04.776Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:29:04.780Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:30:04.782Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T07:31:04.789Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T09:29:37.823Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T09:30:56.841Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T09:31:02.528Z - error: uncaughtException: connection timeout date=Sat Nov 12 2016 15:01:02 GMT+0530 (IST), pid=8091, uid=0, gid=0, cwd=/home/gwr-5/Desktop/BridgeApp, execPath=/opt/node-v6.3.1-linux-x64/bin/node, version=v6.3.1, argv=[/opt/node-v6.3.1-linux-x64/bin/node, /home/gwr-5/Desktop/BridgeApp/server.js], rss=67125248, heapTotal=37732352, heapUsed=29492592, loadavg=[0.2001953125, 0.25390625, 0.220703125], uptime=152770, trace=[column=17, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js, function=.<anonymous>, line=168, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js, function=listener, line=1791, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js, function=.<anonymous>, line=270, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js, function=.<anonymous>, line=322, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js, function=.<anonymous>, line=271, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=10, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js, function=, line=175, method=null, native=false, column=16, file=events.js, function=Socket.g, line=286, method=g, native=false, column=13, file=events.js, function=emitNone, line=86, method=null, native=false, column=7, file=events.js, function=Socket.emit, line=185, method=emit, native=false, column=8, file=net.js, function=Socket._onTimeout, line=333, method=_onTimeout, native=false], stack=[Error: connection timeout,     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js:168:17),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at listener (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js:1791:14),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js:270:14),     at g (events.js:286:16),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js:322:12),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js:271:12),     at g (events.js:286:16),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at Socket.<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js:175:10),     at Socket.g (events.js:286:16),     at emitNone (events.js:86:13),     at Socket.emit (events.js:185:7),     at Socket._onTimeout (net.js:333:8)]
+2016-11-12T09:59:42.080Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:01:41.120Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:03:21.224Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:03:21.232Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T10:11:31.716Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:12:41.977Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T10:13:35.718Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:18:26.755Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:20:27.243Z - error: uncaughtException: connection timeout date=Sat Nov 12 2016 15:50:27 GMT+0530 (IST), pid=11363, uid=0, gid=0, cwd=/home/gwr-5/Desktop/BridgeApp, execPath=/opt/node-v6.3.1-linux-x64/bin/node, version=v6.3.1, argv=[/opt/node-v6.3.1-linux-x64/bin/node, /home/gwr-5/Desktop/BridgeApp/server.js], rss=68136960, heapTotal=37732352, heapUsed=32016880, loadavg=[0.45703125, 0.2783203125, 0.2822265625], uptime=155735, trace=[column=17, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js, function=.<anonymous>, line=168, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js, function=listener, line=1791, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js, function=.<anonymous>, line=270, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js, function=.<anonymous>, line=322, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js, function=.<anonymous>, line=271, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=10, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js, function=, line=175, method=null, native=false, column=16, file=events.js, function=Socket.g, line=286, method=g, native=false, column=13, file=events.js, function=emitNone, line=86, method=null, native=false, column=7, file=events.js, function=Socket.emit, line=185, method=emit, native=false, column=8, file=net.js, function=Socket._onTimeout, line=333, method=_onTimeout, native=false], stack=[Error: connection timeout,     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js:168:17),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at listener (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js:1791:14),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js:270:14),     at g (events.js:286:16),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js:322:12),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js:271:12),     at g (events.js:286:16),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at Socket.<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js:175:10),     at Socket.g (events.js:286:16),     at emitNone (events.js:86:13),     at Socket.emit (events.js:185:7),     at Socket._onTimeout (net.js:333:8)]
+2016-11-12T10:32:29.289Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:34:27.276Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:34:27.283Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T10:38:27.481Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T10:41:47.539Z - error: uncaughtException: connection timeout date=Sat Nov 12 2016 16:11:47 GMT+0530 (IST), pid=12695, uid=0, gid=0, cwd=/home/gwr-5/Desktop/BridgeApp, execPath=/opt/node-v6.3.1-linux-x64/bin/node, version=v6.3.1, argv=[/opt/node-v6.3.1-linux-x64/bin/node, /home/gwr-5/Desktop/BridgeApp/server.js], rss=67403776, heapTotal=37732352, heapUsed=31628104, loadavg=[0.1533203125, 0.21630859375, 0.2763671875], uptime=157015, trace=[column=17, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js, function=.<anonymous>, line=168, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js, function=listener, line=1791, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=14, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js, function=.<anonymous>, line=270, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js, function=.<anonymous>, line=322, method=null, native=false, column=13, file=events.js, function=emitOne, line=96, method=null, native=false, column=7, file=events.js, function=emit, line=188, method=null, native=false, column=12, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js, function=.<anonymous>, line=271, method=null, native=false, column=16, file=events.js, function=g, line=286, method=null, native=false, column=13, file=events.js, function=emitTwo, line=106, method=null, native=false, column=7, file=events.js, function=emit, line=191, method=null, native=false, column=10, file=/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js, function=, line=175, method=null, native=false, column=16, file=events.js, function=Socket.g, line=286, method=g, native=false, column=13, file=events.js, function=emitNone, line=86, method=null, native=false, column=7, file=events.js, function=Socket.emit, line=185, method=emit, native=false, column=8, file=net.js, function=Socket._onTimeout, line=333, method=_onTimeout, native=false], stack=[Error: connection timeout,     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/lib/drivers/node-mongodb-native/connection.js:168:17),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at listener (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/db.js:1791:14),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/lib/server.js:270:14),     at g (events.js:286:16),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/topologies/server.js:322:12),     at emitOne (events.js:96:13),     at emit (events.js:188:7),     at .<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/pool.js:271:12),     at g (events.js:286:16),     at emitTwo (events.js:106:13),     at emit (events.js:191:7),     at Socket.<anonymous> (/home/gwr-5/Desktop/BridgeApp/node_modules/mongoose/node_modules/mongodb/node_modules/mongodb-core/lib/connection/connection.js:175:10),     at Socket.g (events.js:286:16),     at emitNone (events.js:86:13),     at Socket.emit (events.js:185:7),     at Socket._onTimeout (net.js:333:8)]
+2016-11-12T12:35:12.917Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T12:35:34.053Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T12:36:59.885Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T12:39:45.545Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T12:39:48.560Z - error:  Error: connect ECONNREFUSED 43.251.80.79:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-11-12T13:08:46.205Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T13:14:45.209Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T13:14:52.231Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T13:24:11.055Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T13:24:11.061Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T13:37:36.681Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T14:11:34.751Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T14:22:54.542Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T14:28:18.331Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T14:38:53.922Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T14:43:14.577Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T14:54:27.747Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:02:50.661Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:04:27.690Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:16:11.051Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:20:53.905Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:30:47.419Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:30:57.414Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:31:07.405Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:31:07.414Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:31:17.415Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:31:27.417Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:31:37.402Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:31:37.418Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:31:47.422Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:31:49.803Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.804Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.805Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.806Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.807Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.807Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.808Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.808Z - error:  Error: socket hang up
+    at createHangUpError (_http_client.js:252:15)
+    at Socket.socketOnEnd (_http_client.js:344:23)
+    at emitNone (events.js:91:20)
+    at Socket.emit (events.js:185:7)
+    at endReadableNT (_stream_readable.js:975:12)
+    at _combinedTickCallback (internal/process/next_tick.js:74:11)
+    at process._tickCallback (internal/process/next_tick.js:98:9)
+2016-11-12T15:31:49.815Z - error:  Error: read ECONNRESET
+    at exports._errnoException (util.js:1012:11)
+    at TCP.onread (net.js:563:26)
+2016-11-12T15:31:57.422Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:32:07.406Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:35:27.459Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:35:37.432Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:43:31.999Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:43:51.989Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:46:42.034Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:46:42.035Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:47:22.008Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:47:22.008Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:49:28.182Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:49:28.197Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:49:28.198Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:49:28.199Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:49:28.199Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-11-12T15:49:48.133Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:49:48.134Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:49:48.134Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:49:48.134Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-11-12T15:49:48.135Z - info: Sending request to server bridge URI: transactions/checkin/bridge
