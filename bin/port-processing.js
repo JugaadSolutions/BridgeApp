@@ -108,5 +108,9 @@ exports.updatePort = function (eport,stepNo,data,callback) {
                 });
             }
             break;
+        default :
+            eport.data = data;
+            return callback(null,eport);
+            break;
     }
 };

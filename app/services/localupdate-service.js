@@ -42,7 +42,7 @@ exports.updateDB = function (record,cb) {
         },
         function(callback)
         {
-            if(record.cardRFID) {
+            if(record.type == 'checkout') {
                 User.findOne({'smartCardNumber': record.cardRFID}).lean().exec(function (err, result) {
                     if (err) {
                         return callback(err, null);
@@ -176,20 +176,20 @@ exports.updateDB = function (record,cb) {
             }
             if(record.type=='checkin')
             {
-                if(userUpdatedDetails.UserID) {
+                /*if(userUpdatedDetails.UserID) {
                     var transDetails = {
                         user: userUpdatedDetails.UserID,
                         vehicleId: vehicleData.vehicleUid,
                         toPort: portUpdatedDetails.PortID//,
                         //checkOutTime:Date.now
                     };
-                }else {
+                }else {*/
                     var transDetails = {
                         vehicleId: vehicleData.vehicleUid,
                         toPort: portUpdatedDetails.PortID//,
                         //checkOutTime:Date.now
                     };
-                }
+                //}
                 /*Transaction.checkout(transDetails,function (err,result) {
                  if(err)
                  {

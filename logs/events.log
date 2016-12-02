@@ -9369,3 +9369,152 @@ Use mongoose.model(name, schema) date=Tue Nov 08 2016 18:25:42 GMT+0530 (IST), p
 2016-11-12T15:49:48.134Z - info: Sending request to server bridge URI: transactions/checkin/bridge
 2016-11-12T15:49:48.134Z - info: Sending request to server bridge URI: transactions/checkin/bridge
 2016-11-12T15:49:48.135Z - info: Sending request to server bridge URI: transactions/checkin/bridge
+2016-12-01T06:43:09.382Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:43:09.557Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:05.948Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:05.958Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:06.933Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:06.940Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:07.933Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:07.940Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:08.933Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:08.955Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:09.833Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:09.838Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:10.833Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:10.838Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:11.833Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:11.841Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:12.833Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:12.839Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:13.834Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:13.850Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:14.833Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:14.839Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:15.734Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:15.741Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:16.735Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:16.742Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:17.633Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:17.638Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:18.633Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:18.637Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:19.534Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:19.551Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:20.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:20.537Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:21.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:21.544Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:22.534Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:22.540Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:23.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:23.539Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:24.534Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:24.548Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:25.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:25.538Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:26.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:26.542Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:27.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:27.537Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:28.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:28.546Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:29.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:29.537Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:30.534Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:30.539Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:31.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:31.539Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:32.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:32.536Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:33.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:33.537Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:34.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:34.539Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:35.533Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:35.540Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:36.532Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:36.536Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:37.433Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:37.439Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:38.433Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:38.447Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:39.433Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:39.436Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:40.333Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:40.340Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:41.333Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:41.336Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:42.233Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:42.237Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:43.233Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:43.240Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:44.233Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:44.238Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:45.233Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:45.237Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:46.133Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:46.139Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:47.132Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:47.136Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:48.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:48.038Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:49.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:49.044Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:50.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:50.036Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:51.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:51.039Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:52.034Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:52.047Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:53.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:53.037Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:54.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:54.037Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:55.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:55.037Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:56.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:56.037Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:57.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:57.039Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:58.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:58.040Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-01T06:50:59.033Z - info: Step 1 Received Packet from-127.0.0.1:1028  /1051CB3497B400000000110000000000000000000~
+2016-12-01T06:50:59.036Z - error: Sorry! docking port 1 is under maintenance OR EMPTY
+2016-12-02T12:58:50.581Z - info: Step 3 Received Packet from-127.0.0.1:1028  /3051CB3497B400000000E00401006B5D0298110FFFFFFFFFFFF0000010010C101111609C970C90C90C901100000000000000000000000000000000000000000000000000000000000000000000000000000000000~
+2016-12-02T12:58:50.672Z - info: Step 4 Sending response Data Packet : /4051CB3497B400000000E00401006B5D0298950FFFFFFFFFFFF000010010C10212160628970C90C90C9111010010C10212160628970C90C90C91110FFFFFFFFFFFF00000000000000000000000000000000000000~
+2016-12-02T12:58:55.793Z - info: Step A Sending response Data Packet : /A051100000000000~
+2016-12-02T12:58:56.656Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-12-02T12:59:06.639Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-12-02T12:59:09.640Z - error:  Error: connect EHOSTUNREACH 43.251.80.75:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-12-02T12:59:12.639Z - error:  Error: connect EHOSTUNREACH 43.251.80.75:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-12-02T12:59:16.643Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-12-02T12:59:19.643Z - error:  Error: connect EHOSTUNREACH 43.251.80.75:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-12-02T12:59:26.644Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-12-02T12:59:29.643Z - error:  Error: connect EHOSTUNREACH 43.251.80.75:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-12-02T12:59:36.645Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-12-02T12:59:39.643Z - error:  Error: connect EHOSTUNREACH 43.251.80.75:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-12-02T12:59:46.648Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-12-02T12:59:49.651Z - error:  Error: connect EHOSTUNREACH 43.251.80.75:13056
+    at Object.exports._errnoException (util.js:1012:11)
+    at exports._exceptionWithHostPort (util.js:1035:20)
+    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1080:14)
+2016-12-02T12:59:56.650Z - info: Sending request to server bridge URI: transactions/checkout/bridge
+2016-12-02T13:00:07.851Z - info: Step 3 Received Packet from-127.0.0.1:1028  /3051CB3497B400000000E00401006B5D0298110FFFFFFFFFFFF0000010010C101111609C970C90C90C901100000000000000000000000000000000000000000000000000000000000000000000000000000000000~
+2016-12-02T13:00:07.857Z - error: Bicycle with that RFID does not exist or is not available. Contact admin immediately
+2016-12-02T13:00:09.698Z - info: Sending request to server bridge URI: transactions/checkout/bridge

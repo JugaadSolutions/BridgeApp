@@ -8,19 +8,19 @@
 
 var upload = require('./upload-service');
 setInterval(function () {
-    console.log('Timeout');
-upload.uploader(function (err,result) {
+    //console.log('Timeout');
+upload.Checkoutuploader(function (err,result) {
     if(err)
     {
-        console.log('Error');
-        //return;
+        console.log('upload checkoutError');
+        return;
     }
 
 /*
 setTimeout(function () {*/
    /*
 },10000);*/
-    console.log('Upload checkout success');
+    //console.log('Upload checkout success');
 
 
 });
@@ -28,13 +28,13 @@ setTimeout(function () {*/
 },10000);
 
 setInterval(function () {
-    console.log('Timeout');
+   // console.log('Timeout');
 upload.Checkinuploader(function (err,result) {
     if(err)
     {
-        console.log('Error');
+        console.log('Upload checkin Error');
         return;
     }
-    console.log('Upload checkin success');
+  //  console.log('Upload checkin success');
 });
 },30000);

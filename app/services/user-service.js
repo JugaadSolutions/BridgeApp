@@ -245,11 +245,11 @@ exports.checkOutCommunicationService=function (record,cb) {
                         return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
                     }
 
-                    if(result.vehicleId.length>0)
+                    /*if(result.vehicleId.length>0)
                     {
                         EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
                         return callback(new Error("Sorry! It looks like your previous transaction is not completed"));
-                    }
+                    }*/
 
                     if (Number(result.creditBalance) < 5) {
                         EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
