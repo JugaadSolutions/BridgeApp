@@ -131,6 +131,7 @@ module.exports = {
 
     // Docking Port Messages
     NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER: "No docking port found with the port number ",
-    DOCKING_PORT_IS_UNDER_MAINTENANCE: "Sorry! docking port %s is under maintenance"
+    DOCKING_PORT_IS_UNDER_MAINTENANCE: "Sorry! docking port %s is under maintenance",
+    DOCKING_PORT_IS_EMPTY:"Docking port is empty. No Bicycle found"
 };
 

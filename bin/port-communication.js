@@ -24,33 +24,77 @@ udpServer.on('error', function (err) {
 
 var UpdateQueue = queue(1,function (task, done) {
 
-    LocalUpdaterService.updateDB(task,function (err,result) {
-        if(err)
-        {
-            console.log('Error Updating Record');
+    if(task.type=='checkout')
+    {
+        LocalUpdaterService.updateDB(task,function (err,result) {
+            if(err)
+            {
+                console.log('Error Updating Record');
+                done();
+            }
+
+                var time=4995;
+                var msg='Checkout Successful';
+
+            setTimeout(function () {
+                var unit = result.fpga;
+                var port = result.port;
+                var data= '/A0'+unit+port+'100000000000~';
+                var transactionPacket = {
+                    data:data,
+                    clientPort: result.clientPort,
+                    clientHost: result.clientHost
+                };
+                TxQueue.push(transactionPacket);
+            },time);
+            console.log('Updation Successful :'+msg);
             done();
-        }
-        var time= 3000;
-        var msg='Checkin Successful';
-        if(result.checkOutTime)
-        {
-            time=4995;
-            msg='Checkout Successful';
-        }
+        });
+
+    }
+    if(task.type=='checkin')
+    {
+        /*
+        var time=0;
+       // var msg='Checkin Successful';
+
         setTimeout(function () {
-            var unit = result.fpga;
-            var port = result.port;
-            var data= '/A0'+unit+port+'100000000000~';
+            var unit = task.FPGA;
+            var port = task.ePortNumber;
+            var data= '/A0'+unit+port+'200000000000~';
             var transactionPacket = {
                 data:data,
-                clientPort: result.clientPort,
-                clientHost: result.clientHost
+                clientPort: task.clientPort,
+                clientHost: task.clientHost
             };
             TxQueue.push(transactionPacket);
-        },time);
-        console.log('Updation Successful :'+msg);
-        done();
-    });
+        },time);*/
+        LocalUpdaterService.updateDBcheckin(task,function (err,result) {
+            if(err)
+            {
+                console.log('Error Updating Record');
+                done();
+            }
+
+            var time=2000;
+            var msg='Checkin Successful';
+
+            setTimeout(function () {
+                var unit = result.fpga;
+                var port = result.port;
+                var data= '/A0'+unit+port+'100000000000~';
+                var transactionPacket = {
+                    data:data,
+                    clientPort: result.clientPort,
+                    clientHost: result.clientHost
+                };
+                TxQueue.push(transactionPacket);
+            },time);
+            console.log('Updation Successful :'+msg);
+            done();
+        });
+
+    }
 
 });
 
@@ -79,7 +123,8 @@ var RxQueue = queue(1, function(task, done) {
                         done();
                         return;
                     }
-                    if(result.data[1]!=7) {
+                    if(result.data[1]!=7)
+                    {
                         var transactionPacket = {
                             data: result.data,
                             clientPort: result.clientPort,
@@ -89,15 +134,27 @@ var RxQueue = queue(1, function(task, done) {
                     }
                     else
                     {
-                        //eport.data='/A051030000000000~';
-                        var temp = result.data.slice(2,5);
-                        var newdata='/A'+temp+'900000000000~';
-                        var transactionPacket = {
-                            data: newdata,
-                            clientPort: result.clientPort,
-                            clientHost: result.clientHost
+                        var unit = result.FPGA;
+                        var port = result.ePortNumber;
+                        var data= '/A0'+unit+port+'200000000000~';
+                        var transPacket = {
+                            data:data,
+                            clientPort: task.clientPort,
+                            clientHost: task.clientHost
                         };
-                        TxQueue.push(transactionPacket);
+                        TxQueue.push(transPacket);
+                        //eport.data='/A051030000000000~';
+                        setTimeout(function () {
+                            var temp = result.data.slice(2,5);
+                            var newdata='/A'+temp+'900000000000~';
+                            var transactionPacket = {
+                                data: newdata,
+                                clientPort: result.clientPort,
+                                clientHost: result.clientHost
+                            };
+                            TxQueue.push(transactionPacket);
+                        },1000);
+
                     }
                     if(result.data[1]==4 || result.data[1]==7)
                     {
@@ -160,6 +217,19 @@ var TxQueue = queue(1,function (task,done) {
     //console.log('Client Host '+task.clientHost);
     //console.log('Client Port '+task.clientPort);
     //EventLoggersHandler.logger.info('From PBS-Bridge : '+JSON.stringify(task));
+    if(task.data[1]=="A" && task.data[5]=="0")
+    {
+        setTimeout(function () {
+            var temp = task.data.slice(2,5);
+            var newdata='/A'+temp+'100000000000~';
+            var transactionPacket = {
+                data: newdata,
+                clientPort: task.clientPort,
+                clientHost: task.clientHost
+            };
+            TxQueue.push(transactionPacket);
+        },1000)
+    }
     udpServer.send(task.data, 0, task.data.length, task.clientPort, task.clientHost, function (err, bytes) {
 
         if (err) {

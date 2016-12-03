@@ -1,20 +1,20 @@
 {
   "port": "2000",
-  "ipAddress": "13.13.12.1",
-  "stationName":"MCC ZONE-2",
+  "ipAddress": "13.13.13.221",
+  "stationName":"VirtualStation1",
   "udp": {
     "port": 6000,
     "host": "0.0.0.0"
   },
   "serverBridge": {
-    "baseUrl": "http://43.251.80.79:13056/api/"
+    "baseUrl": "http://13.13.13.1:13056/api/"
   },
   "db": {
     "host": "localhost",
     "port": 27017,
     "username": "",
     "password": "",
-    "database": "pbs-bridge"
+    "database": "pbs-testing"
   },
   "security": {
     "secret": "heisenbergtheking",
