@@ -39,6 +39,7 @@
     "mongoose-unique-validator": "^1.0.2",
     "morgan": "~1.7.0",
     "multer": "^1.1.0",
+    "network": "^0.3.0",
     "node-cache": "^4.1.0",
     "node-require-directory": "^1.0.2",
     "node-schedule": "^1.1.0",

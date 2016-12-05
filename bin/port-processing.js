@@ -3,6 +3,8 @@
  */
 
 var User = require('../app/services/user-service');
+var Constants = require('../app/core/constants');
+var VehicleService = require('../app/services/vehicle-service');
     //EventLoggersHandler = require('../handlers/event-loggers-handler');
 
 var receivedEport={};
@@ -84,7 +86,40 @@ exports.updatePort = function (eport,stepNo,data,callback) {
             break;
         case 6:
             eport.data = data;
-                    return callback(null,eport);
+            if(eport.data=="0000000000000000")
+            {
+                console.log('FPGA : '+eport.FPGA+' port'+eport.ePortNumber+'empty');
+                eport.portStatus=Constants.AvailabilityStatus.EMPTY;
+                var u = eport.FPGA;
+                var p =eport.ePortNumber;
+                eport.data='/A0'+u+p+'100000000000~';
+                return callback(null,eport);
+            }
+            else
+            {
+                console.log('port'+eport.ePortNumber+'full with cycle'+ eport.data);
+                VehicleService.vehicleVerification(eport,function (err,result) {
+                    if(err)
+                    {
+                        return callback(err,null);
+                    }
+                    if(result.portStatus==Constants.AvailabilityStatus.ERROR)
+                    {
+                        var u=result.FPGA;
+                        var p = result.ePortNumber;
+                        result.data='/A0'+u+p+'400000000000~';
+                        return callback(null,result);
+                    }
+                    var un=result.FPGA;
+                    var po = result.ePortNumber;
+                    result.data='/A0'+un+po+'100000000000~';
+                   // console.log('port'+result.ePortNumber+'full with cycle'+ result.data);
+                    return callback(null,result);
+                });
+            }
+            //console.log(eport.data);
+
+
             break;
         case 7:
             eport.data = data;

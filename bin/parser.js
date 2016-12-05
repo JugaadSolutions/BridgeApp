@@ -17,7 +17,7 @@ exports.packetParser=function (UDPPacketInfo,callback) {
         console.log("It looks like that's an invalid data packet. Packet Start or End indicator bytes are invalid");
         //TODO modify the data packet - ie add a proper error code or indication code.
         //return responseToClient(null, message, clientHost, clientPort);
-        return callback(new Error(UDPPacketInfo.message));
+        return callback(new Error(UDPPacketInfo.message),null);
     }
 
     var startingIndex = UDPPacketInfo.message.indexOf('/'),
@@ -26,6 +26,11 @@ exports.packetParser=function (UDPPacketInfo,callback) {
     var dataFrame = UDPPacketInfo.message.slice(startingIndex, endingIndex + 1);
     EventLoggersHandler.logger.info('Step ' + UDPPacketInfo.message.slice(1, 2) + ' Received Packet from-'
         + UDPPacketInfo.clientHost +':'+UDPPacketInfo.clientPort +"  " +dataFrame);
+
+    if(dataFrame[1]!=='1' && dataFrame[1]!=='3' && dataFrame[1]!=='6' && dataFrame[1]!=='7' && dataFrame[1]!=='9' )
+    {
+        return callback(new Error('Its look like new STEP NUMBER is entered to the system from Hardware. Please check the step number '+dataFrame[1]),null);
+    }
 
     var packetInfo={
         stepNo:Number(dataFrame[1]),

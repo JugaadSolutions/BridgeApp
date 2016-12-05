@@ -25,8 +25,8 @@ exports.requestHandler = function (httpMethod, uri, requestBody,callback) {
         , function (error, response, body) {
 
             if (error) {
-                EventLoggersHandler.logger.error(error);
-                return callback(error,null);
+               // EventLoggersHandler.logger.error(error);
+                return console.error('Error : Enable to reach server');
             }
 
             if (body) {

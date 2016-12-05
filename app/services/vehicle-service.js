@@ -2,6 +2,7 @@ var async = require('async'),
     Vehicle=require('../models/vehicle'),
     mongoose = require('mongoose'),
     Port = require('../models/port'),
+    Constants = require('../core/constants'),
    // Fleet = require('../models/fleet'),
     Messages = require('../core/messages');
 
@@ -103,4 +104,32 @@ exports.getAllRecords=function (record,callback) {
         }
         return callback(null,result);
     });*/
+};
+
+exports.vehicleVerification = function (record,callback) {
+
+    async.series([
+        function (callback) {
+            Vehicle.findOne({'vehicleRFID':record.data},function (err,result) {
+                if(err)
+                {
+                    return callback(err,null);
+                }
+                if(!result)
+                {
+                    record.portStatus=Constants.AvailabilityStatus.ERROR;
+                    return callback(null,result);
+                }
+                record.portStatus=Constants.AvailabilityStatus.FULL;
+                return callback(null,result);
+            });
+        }
+    ],function (err,result) {
+        if(err)
+        {
+            return callback(err,null);
+        }
+        return callback(null,record);
+    });
+
 };

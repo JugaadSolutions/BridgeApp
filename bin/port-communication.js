@@ -16,7 +16,7 @@ var clientHost, clientPort;
 
 udpServer.on('error', function (err) {
 
-    console.log(err);
+    console.error(err);
     // TODO
     //server.close();// no need to close
 
@@ -69,12 +69,22 @@ var UpdateQueue = queue(1,function (task, done) {
             };
             TxQueue.push(transactionPacket);
         },time);*/
+
         LocalUpdaterService.updateDBcheckin(task,function (err,result) {
             if(err)
             {
                 console.log('Error Updating Record');
                 done();
             }
+            var unit = task.FPGA;
+            var port = task.ePortNumber;
+            var data= '/A0'+unit+port+'900000000000~';
+            var transactionPacket = {
+                data: data,
+                clientPort: task.clientPort,
+                clientHost: task.clientHost
+            };
+            TxQueue.push(transactionPacket);
 
             var time=2000;
             var msg='Checkin Successful';
@@ -100,31 +110,87 @@ var UpdateQueue = queue(1,function (task, done) {
 
 var RxQueue = queue(1, function(task, done) {
     Parser.packetParser(task,function (err,result) {
-        if(err)
-        {
+        if (err) {
             console.log('Error Parsing Packet');
+            return console.error(err.message.toString());
             done();
-           // return responseToClient(null, err, clientHost, clientPort);
-
+            // return responseToClient(null, err, clientHost, clientPort);
         }
-         ports = eport;
-        for(var i=0;i<ports.length;i++)
-        {
-            if(ports[i].FPGA==result.FPGA && ports[i].ePortNumber==result.ePortNumber)
-            {
-                ports[i].clientHost=result.clientHost;
-                ports[i].clientPort=result.clientPort;
-                //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
-                portProcessor.updatePort(ports[i],result.stepNo,result.data,function (err,result) {
 
-                    if(err)
-                    {
+        ports = eport;
+        if (result.stepNo == 6) {           //poll response
+            var portNumber = [];
+            var cycle = [];
+
+            portNumber.push(result.data.slice(4, 5));
+            cycle.push(result.data.slice(5, 21));
+
+            portNumber.push(result.data.slice(21, 22));
+            cycle.push(result.data.slice(22, 38));
+
+            portNumber.push(result.data.slice(38, 39));
+            cycle.push(result.data.slice(39, 55));
+
+            portNumber.push(result.data.slice(55, 56));
+            cycle.push(result.data.slice(56, 72));
+
+            for (var i = 0; i < ports.length; i++) {
+                if (ports[i].FPGA == result.FPGA ) {
+
+                    for (var j = 0; j < 4; j++) {
+
+                        if (ports[i].ePortNumber == portNumber[j]) {
+                            ports[i].clientHost = result.clientHost;
+                            ports[i].clientPort = result.clientPort;
+                            portProcessor.updatePort(ports[i], result.stepNo, cycle[j], function (err, result) {
+                                if (err) {
+                                    console.log('Error in Port Processing');
+                                    done();
+                                    return;
+                                }
+                                var transactionPacket = {
+                                    data: result.data,
+                                    clientPort: result.clientPort,
+                                    clientHost: result.clientHost
+                                };
+                                TxQueue.push(transactionPacket);
+                            });
+                        }
+                    }
+
+                }
+
+            }
+           // done();
+        }
+        else {      //steps: 1,3,7
+        for (var i = 0; i < ports.length; i++) {
+            if (ports[i].FPGA == result.FPGA && ports[i].ePortNumber == result.ePortNumber) {
+                ports[i].clientHost = result.clientHost;
+                ports[i].clientPort = result.clientPort;
+
+                if (result.stepNo == 7) {
+                    var unit = result.FPGA;
+                    var port = result.ePortNumber;
+                    var data = '/A0' + unit + port + '200000000000~';
+                    var transPacket = {
+                        data: data,
+                        clientPort: task.clientPort,
+                        clientHost: task.clientHost
+                    };
+                    TxQueue.push(transPacket);
+                }
+                //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
+                portProcessor.updatePort(ports[i], result.stepNo, result.data, function (err, result) {
+
+                    if (err) {
                         console.log('Error in Port Processing');
                         done();
                         return;
                     }
-                    if(result.data[1]!=7)
-                    {
+
+
+                    if ((result.data[1] != 7) && (result.data[1] != 6)) {
                         var transactionPacket = {
                             data: result.data,
                             clientPort: result.clientPort,
@@ -132,80 +198,57 @@ var RxQueue = queue(1, function(task, done) {
                         };
                         TxQueue.push(transactionPacket);
                     }
-                    else
-                    {
-                        var unit = result.FPGA;
-                        var port = result.ePortNumber;
-                        var data= '/A0'+unit+port+'200000000000~';
-                        var transPacket = {
-                            data:data,
-                            clientPort: task.clientPort,
-                            clientHost: task.clientHost
-                        };
-                        TxQueue.push(transPacket);
-                        //eport.data='/A051030000000000~';
-                        setTimeout(function () {
-                            var temp = result.data.slice(2,5);
-                            var newdata='/A'+temp+'900000000000~';
-                            var transactionPacket = {
-                                data: newdata,
-                                clientPort: result.clientPort,
-                                clientHost: result.clientHost
-                            };
-                            TxQueue.push(transactionPacket);
-                        },1000);
 
-                    }
-                    if(result.data[1]==4 || result.data[1]==7)
-                    {
-                        var updateObj={};
-                        if(result.data[1]==4)
-                        {
-                            var obj={
-                                type:'checkout',
-                                PortID:result.PortID,
-                                FPGA:result.FPGA,
-                                ePortNumber:result.ePortNumber,
-                                UserID:result.UserID,
-                                cardRFID:result.cardRFID,
-                                vehicleid:result.vehicleid,
-                                vehicleRFID:result.vehicleRFId,
-                                vehicleUid:result.vehicleUid,
-                                portStatus:result.portStatus,
+                    //eport.data='/A051030000000000~';
+
+
+                    if (result.data[1] == 4 || result.data[1] == 7) {
+                        var updateObj = {};
+                        if (result.data[1] == 4) {
+                            var obj = {
+                                type: 'checkout',
+                                PortID: result.PortID,
+                                FPGA: result.FPGA,
+                                ePortNumber: result.ePortNumber,
+                                UserID: result.UserID,
+                                cardRFID: result.cardRFID,
+                                vehicleid: result.vehicleid,
+                                vehicleRFID: result.vehicleRFId,
+                                vehicleUid: result.vehicleUid,
+                                portStatus: result.portStatus,
                                 clientPort: result.clientPort,
                                 clientHost: result.clientHost
                             };
 
-                            updateObj=obj;
+                            updateObj = obj;
 
                         }
-                        else
-                        {
-                            var obj={
-                                type:'checkin',
-                                PortID:result.PortID,
-                                FPGA:result.FPGA,
-                                ePortNumber:result.ePortNumber,
-                                UserID:result.UserID,
-                                cardRFID:result.cardRFID,
-                                vehicleRFId:result.vehicleRFId,
-                                vehicleUid:result.vehicleUid,
-                                portStatus:result.portStatus,
+                        else {
+                            var obj = {
+                                type: 'checkin',
+                                PortID: result.PortID,
+                                FPGA: result.FPGA,
+                                ePortNumber: result.ePortNumber,
+                                UserID: result.UserID,
+                                cardRFID: result.cardRFID,
+                                vehicleRFId: result.vehicleRFId,
+                                vehicleUid: result.vehicleUid,
+                                portStatus: result.portStatus,
                                 clientPort: result.clientPort,
                                 clientHost: result.clientHost
                             };
 
-                            updateObj=obj;
+                            updateObj = obj;
                         }
                         UpdateQueue.push(updateObj);
-                       // done();
+                        // done();
                     }
 
                 });
                 break;
             }
         }
-
+    }
     });
     done();
 });
@@ -283,7 +326,7 @@ udpServer.on('message', function (message, rinfo) {
 
 
 udpServer.on('listening', function () {
-    console.log("PBS Bridge listening to requests from Anywhere");
+    console.log("UDP Server listening to requests from Anywhere");
 });
 
 udpServer.bind({
