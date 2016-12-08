@@ -1,7 +1,7 @@
 {
   "port": "2000",
-  "ipAddress": "13.13.13.221",
-  "stationName":"VirtualStation1",
+  "ipAddress": "13.13.12.1",
+  "stationName":"MCC ZONE-2",
   "udp": {
     "port": 6000,
     "host": "0.0.0.0"
@@ -14,7 +14,7 @@
     "port": 27017,
     "username": "",
     "password": "",
-    "database": "pbs-testing"
+    "database": "pbs-bridge"
   },
   "security": {
     "secret": "heisenbergtheking",
