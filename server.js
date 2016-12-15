@@ -21,6 +21,21 @@ setInterval(function(){
                 conn=0;
             }
         }
+        /* obj should be:
 
+         { name: 'eth0',
+         ip_address: '10.0.1.3',
+         mac_address: '56:e5:f9:e4:38:1d',
+         type: 'Wired',
+         netmask: '255.255.255.0',
+         gateway_ip: '10.0.1.1' }
+
+         */
     });
 },2000);
+
+
+/*
+p.printIt(function (res) {
+    console.log('Server : '+res);
+});*/

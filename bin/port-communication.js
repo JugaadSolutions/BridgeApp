@@ -7,6 +7,7 @@ var dgram = require('dgram'),
    // RequestService = require('../app/services/request-service'),
     EventLoggersHandler = require('../app/handlers/event-loggers-handler'),
     LocalUpdaterService = require('../app/services/localupdate-service'),
+    UserService = require('../app/services/user-service'),
     udpServer = dgram.createSocket('udp4');
 var Parser =require('./parser');
 var eport = require('./eport');
@@ -21,6 +22,25 @@ udpServer.on('error', function (err) {
     //server.close();// no need to close
 
 });
+/* *************************************** */
+
+
+var PollPackets = [
+    {"data":"/5030000000000000~","clientPort":"1024","clientHost":"13.13.12.3"},
+    {"data":"/5040000000000000~","clientPort":"1024","clientHost":"13.13.12.4"},
+    {"data":"/5050000000000000~","clientPort":"1024","clientHost":"13.13.12.5"},
+    {"data":"/5060000000000000~","clientPort":"1024","clientHost":"13.13.12.6"}
+];
+
+var PollPacketIndex = 0;
+
+setInterval(function () {
+
+    if(PollPacketIndex >= 4 )
+        PollPacketIndex = 0;
+
+    TxQueue.push(PollPackets[PollPacketIndex++]);
+},30000);
 
 var UpdateQueue = queue(1,function (task, done) {
 
@@ -101,6 +121,16 @@ var UpdateQueue = queue(1,function (task, done) {
                 TxQueue.push(transactionPacket);
             },time);
             console.log('Updation Successful :'+msg);
+            setTimeout(function () {
+                var unit = result.fpga;
+                var data= '/50'+unit+'0000000000000~';
+                var transactionPacket = {
+                    data:data,
+                    clientPort: result.clientPort,
+                    clientHost: result.clientHost
+                };
+                TxQueue.push(transactionPacket);
+            },time);
             done();
         });
 
@@ -116,8 +146,47 @@ var RxQueue = queue(1, function(task, done) {
             done();
             // return responseToClient(null, err, clientHost, clientPort);
         }
+var keyUser;
+        if (result.stepNo == 1) {
+            UserService.userVerify(result.data.slice(5, 21),function (err,eid,userdetails) {
+                if(err)
+                {
+                    if(eid==1) {
+                        var unit = result.FPGA;
+                        var port = result.ePortNumber;
+                        var data = '/A0' + unit + port + 'B00000000000~';
+                        var transPacket = {
+                            data: data,
+                            clientPort: task.clientPort,
+                            clientHost: task.clientHost
+                        };
+                        TxQueue.push(transPacket);
+                        var time = 2000;
+                        console.log('Please Verify your card at KIOSK');
+                        setTimeout(function () {
+                            var unit = result.FPGA;
+                            var port = result.ePortNumber;
+                            var data = '/A0' + unit + port + '100000000000~';
+                            var transactionPacket = {
+                                data: data,
+                                clientPort: result.clientPort,
+                                clientHost: result.clientHost
+                            };
+                            TxQueue.push(transactionPacket);
+                        }, time);
+                        return console.error(err.message.toString());
+                        done();
+                    }else {
+                        console.log('Error Parsing Packet');
+                        return console.error(err.message.toString());
+                        done();
+                    }
+                }
+                keyUser = userdetails.smartCardKey;
+            });
+        }
 
-        ports = eport;
+            ports = eport;
         if (result.stepNo == 6) {           //poll response
             var portNumber = [];
             var cycle = [];
@@ -142,7 +211,7 @@ var RxQueue = queue(1, function(task, done) {
                         if (ports[i].ePortNumber == portNumber[j]) {
                             ports[i].clientHost = result.clientHost;
                             ports[i].clientPort = result.clientPort;
-                            portProcessor.updatePort(ports[i], result.stepNo, cycle[j], function (err, result) {
+                            portProcessor.updatePort(ports[i], result.stepNo, cycle[j],keyUser, function (err, result) {
                                 if (err) {
                                     console.log('Error in Port Processing');
                                     done();
@@ -181,7 +250,7 @@ var RxQueue = queue(1, function(task, done) {
                     TxQueue.push(transPacket);
                 }
                 //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
-                portProcessor.updatePort(ports[i], result.stepNo, result.data, function (err, result) {
+                portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
 
                     if (err) {
                         console.log('Error in Port Processing');

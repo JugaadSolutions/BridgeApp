@@ -3,6 +3,7 @@ var async = require('async'),
     mongoose = require('mongoose'),
     Port = require('../models/port'),
     Constants = require('../core/constants'),
+    LocalUpdate = require('../services/localupdate-service'),
    // Fleet = require('../models/fleet'),
     Messages = require('../core/messages');
 
@@ -106,8 +107,9 @@ exports.getAllRecords=function (record,callback) {
     });*/
 };
 
-exports.vehicleVerification = function (record,callback) {
+exports.vehicleVerification = function (record,id,callback) {
 
+    var vehicleDetails;
     async.series([
         function (callback) {
             Vehicle.findOne({'vehicleRFID':record.data},function (err,result) {
@@ -120,9 +122,43 @@ exports.vehicleVerification = function (record,callback) {
                     record.portStatus=Constants.AvailabilityStatus.ERROR;
                     return callback(null,result);
                 }
+                vehicleDetails=result;
+                record.vehicleRFID=result.vehicleRFID;
+                record.vehicleUid=result.vehicleUid;
                 record.portStatus=Constants.AvailabilityStatus.FULL;
                 return callback(null,result);
             });
+        },
+        function (callback) {
+            if(id==1)
+            {
+                if(vehicleDetails)
+                {
+                    var obj = {
+                        type: 'checkin',
+                        PortID: record.PortID,
+                        FPGA: record.FPGA,
+                        ePortNumber: record.ePortNumber,
+                        UserID: record.UserID,
+                        cardRFID: record.cardRFID,
+                        vehicleRFId: record.vehicleRFId,
+                        vehicleUid: record.vehicleUid,
+                        portStatus: record.portStatus,
+                        clientPort: record.clientPort,
+                        clientHost: record.clientHost
+                    };
+                    LocalUpdate.updateDBcheckin(obj,function (err,result) {
+                        if(err){
+                            return callback(err,null);
+                        }
+                        callback(null,result);
+                    });
+                }
+            }
+            else
+            {
+                return callback(null,null);
+            }
         }
     ],function (err,result) {
         if(err)

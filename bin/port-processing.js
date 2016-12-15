@@ -18,7 +18,7 @@ var str =[
 var i=0;
 */
 
-exports.updatePort = function (eport,stepNo,data,callback) {
+exports.updatePort = function (eport,stepNo,data,keyUser,callback) {
 
     receivedEport=eport;
     //console.log('Update function called with this Eport '+JSON.stringify(receivedEport));
@@ -29,15 +29,13 @@ exports.updatePort = function (eport,stepNo,data,callback) {
     {
         case 1:
                     eport.data = data;
-                    User.checkOutAuthenticationService(eport,function (err,result) {
+                    User.checkOutAuthenticationService(eport,keyUser,function (err,result) {
                        if(err)
                        {
                            return callback(err,null);
                        }
                         return callback(null,result);
                     });
-
-
 
             break;
         case 3:
@@ -98,24 +96,46 @@ exports.updatePort = function (eport,stepNo,data,callback) {
             else
             {
                 console.log('port'+eport.ePortNumber+'full with cycle'+ eport.data);
-                VehicleService.vehicleVerification(eport,function (err,result) {
-                    if(err)
+                if(eport.portStatus==Constants.AvailabilityStatus.FULL)
+                {
+                    if(eport.vehicleRFID==eport.data)
                     {
-                        return callback(err,null);
+                        var un = eport.FPGA;
+                        var po =eport.ePortNumber;
+                        eport.data='/A0'+un+po+'100000000000~';
+                        return callback(null,eport);
                     }
-                    if(result.portStatus==Constants.AvailabilityStatus.ERROR)
-                    {
-                        var u=result.FPGA;
-                        var p = result.ePortNumber;
-                        result.data='/A0'+u+p+'400000000000~';
+                    else {
+                        var un = eport.FPGA;
+                        var po =eport.ePortNumber;
+                        eport.portStatus=Constants.AvailabilityStatus.ERROR;
+                        eport.data='/A0'+un+po+'B00000000000~';
+                        return callback(null,eport);
+                    }
+                }
+                else if(eport.portStatus==Constants.AvailabilityStatus.EMPTY)
+                {
+                    var id = 1;
+                    VehicleService.vehicleVerification(eport,id,function (err,result) {
+                        if(err)
+                        {
+                            return callback(err,null);
+                        }
+                        if(result.portStatus==Constants.AvailabilityStatus.ERROR)
+                        {
+                            var u=result.FPGA;
+                            var p = result.ePortNumber;
+                            result.data='/A0'+u+p+'400000000000~';
+                            return callback(null,result);
+                        }
+                        var un=result.FPGA;
+                        var po = result.ePortNumber;
+                        result.data='/A0'+un+po+'100000000000~';
+                        // console.log('port'+result.ePortNumber+'full with cycle'+ result.data);
                         return callback(null,result);
-                    }
-                    var un=result.FPGA;
-                    var po = result.ePortNumber;
-                    result.data='/A0'+un+po+'100000000000~';
-                   // console.log('port'+result.ePortNumber+'full with cycle'+ result.data);
-                    return callback(null,result);
-                });
+                    });
+                }
+
             }
             //console.log(eport.data);
 

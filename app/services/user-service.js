@@ -10,6 +10,7 @@ var Messages = require('../core/messages'),
     jwt = require('jsonwebtoken'),
     config = require('config'),
     Constants = require('../core/constants'),
+    moment = require('moment'),
     Vehicle=require('../models/vehicle'),
     EventLoggersHandler = require('../handlers/event-loggers-handler'),
     User = require('../models/user');
@@ -20,14 +21,56 @@ var DockingStation = require('../models/dock-station'),
 
 /* ************** For Bridge ************************** */
 
-exports.checkOutAuthenticationService=function (record,cb) {
-    var command,
-        keyUser;
+exports.userVerify = function (id,callback) {
+    User.findOne({'smartCardNumber':id}).lean().exec(function (err,result) {
+        if(err)
+        {
+            return console.error('User not Found : '+err);
+        }
+        if (!result) {
+            EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+            return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."),1, null);
+        }
+        if(result._type=='member')
+        {
+            if (!result.status == Constants.MemberStatus.REGISTERED) {
+                EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                return callback(new Error("Sorry! It looks like your validity has expired"),1,null);
+            }
+
+            if (result.creditBalance <= 5) {
+                EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+
+                return callback(new Error("Sorry! You don't have sufficient balance"),1,null);
+            }
+            var validity = moment(result.validity);
+            var current = moment();
+            var days = moment.duration(validity.diff(current));
+            var duration = days.asDays();
+            if(duration<0)
+            {
+                EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                return callback(new Error("Sorry! It looks like your validity has expired"),1,null);
+            }
+
+            //console.log(userDetails.smartCardKey);
+            //keyUser = userDetails.smartCardKey;
+            //console.log(keyUser);
+            //callback(null,null);
+        }
+
+        return callback(null,0,result);
+    });
+};
+
+exports.checkOutAuthenticationService=function (record,keyUser,cb) {
+    var command;
+       // keyUser;
     var Ds=0;
     var Dp=0;
     var userDetails=0;
 async.series([
-    function (callback) {
+    /*function (callback) {
         command = record.data[21];
         if (command != "1") {
             EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
@@ -46,9 +89,15 @@ async.series([
             userDetails=result;
             return callback(null,result);
         });
-    },
+    },*/
     function (callback) {
     //console.log(record.data.length);
+        command = record.data[21];
+        if (command != "1") {
+            EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+            return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+        }
+
         if (record.data.length != 43) {
             EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
             return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
@@ -100,7 +149,7 @@ async.series([
         {
             return callback(null,null);
         }
-    }/*,
+    },/*
     function (callback) {
         if(Dp!=0)
         {
@@ -127,7 +176,7 @@ async.series([
         {
             return callback(null,null);
         }
-    }*/,
+    }*//*,
     function (callback) {
         if(userDetails!=0)
         {
@@ -140,6 +189,7 @@ async.series([
 
                 if (userDetails.creditBalance < 5) {
                     EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+
                     return callback(new Error("Sorry! You don't have sufficient balance"));
                 }
                 //console.log(userDetails.smartCardKey);
@@ -159,12 +209,12 @@ async.series([
             return callback(null,null);
         }
 
-    },
+    },*/
     function (callback) {
         var stepNumber = 2;
         var indicatorId = "2";
         var command = "9";
-
+        keyUser="FFFFFFFFFFFF0000                                                                                                            ";
         record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 1, 2, stepNumber);
         record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 24, 40, keyUser);
         record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 22, 23, indicatorId);
@@ -287,7 +337,7 @@ exports.checkOutCommunicationService=function (record,cb) {
                         return callback(new Error("Sorry! It looks like your previous transaction is not completed"));
                     }*/
 
-                    if (Number(result.creditBalance) < 5) {
+                    if (Number(result.creditBalance) <= 5) {
                         EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
                         return callback(new Error("Sorry! You don't have sufficient balance"));
                     }

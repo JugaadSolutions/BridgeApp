@@ -7,8 +7,6 @@
     require('../app/models/checkin');
 
 var upload = require('./upload-service');
-var checkOutStartup = 1;
-var checkInStartup = 1;
 setInterval(function () {
     //console.log('Timeout');
 upload.Checkoutuploader(function (err,result) {
@@ -17,12 +15,6 @@ upload.Checkoutuploader(function (err,result) {
         console.log('upload checkoutError');
         return;
     }
-
-/*
-setTimeout(function () {*/
-   /*
-},10000);*/
-
 }
 );
 
@@ -39,11 +31,4 @@ upload.Checkinuploader(function (err,result) {
 
 });
 },3000);
-/*
 
-if(checkInStartup == 1)
-{
-    console.log('Upload checkin success');
-    checkInStartup = 0;
-
-}*/
