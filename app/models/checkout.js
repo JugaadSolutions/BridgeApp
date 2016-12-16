@@ -18,6 +18,7 @@ var schema = {
     vehicleId: {type: Number, required: true},
     fromPort: {type: Number, required: true},// ref: 'DockingPort'},
     checkOutTime: {type: Date, required: false,default: Date.now},
+    duration:{type: Number, required: false,default:0},
     status: {type: String, required: true,default:'Open'},
     errorStatus:{type: Number, required: false,default:0},
     errorMsg:{type: String, required: false}

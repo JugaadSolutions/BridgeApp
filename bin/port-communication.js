@@ -139,6 +139,7 @@ var UpdateQueue = queue(1,function (task, done) {
 });
 
 var RxQueue = queue(1, function(task, done) {
+    var keyUser;
     Parser.packetParser(task,function (err,result) {
         if (err) {
             console.log('Error Parsing Packet');
@@ -146,7 +147,7 @@ var RxQueue = queue(1, function(task, done) {
             done();
             // return responseToClient(null, err, clientHost, clientPort);
         }
-var keyUser;
+
         if (result.stepNo == 1) {
             UserService.userVerify(result.data.slice(5, 21),function (err,eid,userdetails) {
                 if(err)

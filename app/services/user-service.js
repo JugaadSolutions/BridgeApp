@@ -10,7 +10,7 @@ var Messages = require('../core/messages'),
     jwt = require('jsonwebtoken'),
     config = require('config'),
     Constants = require('../core/constants'),
-    moment = require('moment'),
+    //moment = require('moment'),
     Vehicle=require('../models/vehicle'),
     EventLoggersHandler = require('../handlers/event-loggers-handler'),
     User = require('../models/user');
@@ -214,7 +214,7 @@ async.series([
         var stepNumber = 2;
         var indicatorId = "2";
         var command = "9";
-        keyUser="FFFFFFFFFFFF0000                                                                                                            ";
+        keyUser="FFFFFFFFFFFF0000";
         record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 1, 2, stepNumber);
         record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 24, 40, keyUser);
         record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 22, 23, indicatorId);
