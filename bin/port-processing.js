@@ -109,7 +109,7 @@ exports.updatePort = function (eport,stepNo,data,keyUser,callback) {
                         var un = eport.FPGA;
                         var po =eport.ePortNumber;
                         eport.portStatus=Constants.AvailabilityStatus.ERROR;
-                        eport.data='/A0'+un+po+'B00000000000~';
+                        eport.data='/A0'+un+po+'A00000000000~';
                         return callback(null,eport);
                     }
                 }

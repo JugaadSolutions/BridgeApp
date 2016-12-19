@@ -90,7 +90,7 @@ async.series([
             return callback(null,result);
         });
     },*/
-    function (callback) {
+/*    function (callback) {
     //console.log(record.data.length);
         command = record.data[21];
         if (command != "1") {
@@ -149,7 +149,7 @@ async.series([
         {
             return callback(null,null);
         }
-    },/*
+    },*//*
     function (callback) {
         if(Dp!=0)
         {
@@ -211,6 +211,17 @@ async.series([
 
     },*/
     function (callback) {
+        command = record.data[21];
+        if (command != "1") {
+            EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+            return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+        }
+
+        if (record.data.length != 43) {
+            EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
+            return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
+        }
+
         var stepNumber = 2;
         var indicatorId = "2";
         var command = "9";

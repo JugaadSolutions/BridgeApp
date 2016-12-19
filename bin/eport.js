@@ -33,14 +33,18 @@ async.series([
                     portCapacity: data.portCapacity,
                     FPGA:data.FPGA,
                     ePortNumber:data.ePortNumber,
-                    vehicleid: data.vehicleId[0].vehicleid,
-                    vehicleRFID:'',
-                    vehicleUid: data.vehicleId[0].vehicleUid,
+                    vehicleid: data.vehicleId[data.vehicleId.length-1].vehicleid,
+                    vehicleRFID:data.vehicleId[data.vehicleId.length-1].vehicleid.vehicleRFID,
+                    vehicleUid: data.vehicleId[data.vehicleId.length-1].vehicleUid,
                     lockStatus: Constants.LockStatus.NORMAL,
                     LEDIndication:0,
                     clientHost:'',
                     clientPort:''
                 };
+                console.log('FPGA : '+eportDetails.FPGA);
+                console.log('PortNumber : '+eportDetails.ePortNumber);
+                console.log('PortStatus : '+eportDetails.portStatus);
+                console.log('VehicleRFID : '+eportDetails.vehicleRFID);
             }
             else
             {
