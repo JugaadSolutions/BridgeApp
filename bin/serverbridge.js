@@ -26,7 +26,7 @@ upload.Checkinuploader(function (err,result) {
     if(err)
     {
         console.log('Upload checkin Error');
-       // return;
+        return;
     }
 
 });
