@@ -96,7 +96,11 @@ exports.updatePort = function (eport,stepNo,data,keyUser,callback) {
             else
             {
                 console.log('port'+eport.ePortNumber+'full with cycle'+ eport.data);
-                if(eport.portStatus==Constants.AvailabilityStatus.FULL)
+                if(eport.portStatus==Constants.AvailabilityStatus.TRANSITION)
+                {
+                    return callback(null,eport);
+                }
+                else if(eport.portStatus==Constants.AvailabilityStatus.FULL)
                 {
                     if(eport.vehicleRFID==eport.data)
                     {

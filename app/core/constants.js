@@ -43,7 +43,8 @@ exports.AvailabilityStatus={
     ERROR:-1,
     FULL:1,
     EMPTY:2,
-    NORMAL:3
+    NORMAL:3,
+    TRANSITION:4
 };
 
 exports.FleetStatus={

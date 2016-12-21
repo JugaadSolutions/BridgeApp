@@ -386,7 +386,7 @@ exports.checkOutCommunicationService=function (record,cb) {
 
             record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 56, 88, userReadData);
 
-            record.portStatus= Constants.AvailabilityStatus.EMPTY;
+            record.portStatus= Constants.AvailabilityStatus.TRANSITION;
             return callback(null, null);
         }
     ],function (err,results) {

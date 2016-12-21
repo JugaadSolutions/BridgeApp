@@ -4,6 +4,7 @@ var queue = require('block-queue');
 var dgram = require('dgram'),
     config = require('config'),
     Messages = require('../app/core/messages'),
+    Constants = require('../app/core/constants'),
    // RequestService = require('../app/services/request-service'),
     EventLoggersHandler = require('../app/handlers/event-loggers-handler'),
     LocalUpdaterService = require('../app/services/localupdate-service'),
@@ -261,12 +262,38 @@ var RxQueue = queue(1, function(task, done) {
 
 
                     if ((result.data[1] != 7) && (result.data[1] != 6)) {
-                        var transactionPacket = {
-                            data: result.data,
-                            clientPort: result.clientPort,
-                            clientHost: result.clientHost
-                        };
-                        TxQueue.push(transactionPacket);
+                        if(result.data[1] == 4){
+                            var transactionPacket = {
+                                data: result.data,
+                                clientPort: result.clientPort,
+                                clientHost: result.clientHost
+                            };
+                            TxQueue.push(transactionPacket);
+                            setTimeout(function () {
+                                var f= result.FPGA;
+                                var p= result.ePortNumber;
+                                for (var i = 0; i < ports.length; i++) {
+                                    if (ports[i].FPGA == f && ports[i].ePortNumber == p) {
+                                        ports[i].portStatus=Constants.AvailabilityStatus.EMPTY;
+                                        break;
+                                    }
+                                }
+                            },10000);
+                        }
+                        else if(result.data[0]!='/')
+                        {
+
+                        }
+                        else
+                        {
+                            var transactionPacket = {
+                                data: result.data,
+                                clientPort: result.clientPort,
+                                clientHost: result.clientHost
+                            };
+                            TxQueue.push(transactionPacket);
+                        }
+
                     }
 
                     //eport.data='/A051030000000000~';
@@ -290,7 +317,9 @@ var RxQueue = queue(1, function(task, done) {
                                 clientHost: result.clientHost
                             };
 
-                            updateObj = obj;
+                            //updateObj = obj;
+                            UpdateQueue.push(obj);
+                            done();
 
                         }
                         else {
@@ -308,9 +337,10 @@ var RxQueue = queue(1, function(task, done) {
                                 clientHost: result.clientHost
                             };
 
-                            updateObj = obj;
+                            UpdateQueue.push(obj);
+                            done();
                         }
-                        UpdateQueue.push(updateObj);
+                        //UpdateQueue.push(updateObj);
                         // done();
                     }
 

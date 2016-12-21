@@ -16,7 +16,7 @@ setInterval(function(){
                 require('./bin/eMemberPlans');
                 require('./bin/pbs-bridge');
                 require('./bin/port-communication');
-                require('./bin/serverbridge');
+                //require('./bin/serverbridge');
                 console.log('All servers Restarted');
                 conn=0;
             }

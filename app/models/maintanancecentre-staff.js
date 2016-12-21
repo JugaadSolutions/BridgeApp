@@ -1,6 +1,7 @@
 /**
  * Created by root on 13/12/16.
  */
+//require('./user');
 var mongoose = require('mongoose'),
     //extend = require('mongoose-schema-extend'),
     Schema = mongoose.Schema;
