@@ -313,7 +313,8 @@ exports.checkOutCommunicationService=function (record,cb) {
                         EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
                         return callback(new Error("Sorry! Bicycle with that RFID does not exist or is not available. Contact admin immediately."), null);
                     }*/
-                    record.vehicleRFID = result.vehicleRFID;
+                    //record.vehicleRFID = result.vehicleRFID;
+                    record.vehicleRFID = '';
                     record.vehicleUid = result.vehicleUid;
                     record.vehicleid=result._id;
                     return callback(null, result);

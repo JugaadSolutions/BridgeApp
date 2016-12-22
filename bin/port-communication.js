@@ -315,7 +315,7 @@ var RxQueue = queue(1, function(task, done) {
                                 vehicleid: result.vehicleid,
                                 vehicleRFID: result.vehicleRFId,
                                 vehicleUid: result.vehicleUid,
-                                portStatus: result.portStatus,
+                                portStatus: Constants.AvailabilityStatus.EMPTY,
                                 clientPort: result.clientPort,
                                 clientHost: result.clientHost
                             };

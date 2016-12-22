@@ -268,6 +268,7 @@ exports.updateDBcheckin = function (record,cb) {
                     vehicleUid: record.vehicleUid
 
                 };
+                result.vehicleId=[];
                 result.vehicleId.push(vehicleDetails);
 
                 Port.findByIdAndUpdate(result._id, result, {new: true}, function (err, result) {
