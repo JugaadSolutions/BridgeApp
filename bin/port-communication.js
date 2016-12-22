@@ -274,8 +274,11 @@ var RxQueue = queue(1, function(task, done) {
                                 var p= result.ePortNumber;
                                 for (var i = 0; i < ports.length; i++) {
                                     if (ports[i].FPGA == f && ports[i].ePortNumber == p) {
-                                        ports[i].portStatus=Constants.AvailabilityStatus.EMPTY;
-                                        break;
+                                        if(ports[i].portStatus==Constants.AvailabilityStatus.TRANSITION)
+                                        {
+                                            ports[i].portStatus=Constants.AvailabilityStatus.EMPTY;
+                                            break;
+                                        }
                                     }
                                 }
                             },10000);
