@@ -289,6 +289,7 @@ exports.checkOutCommunicationService=function (record,cb) {
             return callback(null,null);
         },
             function (callback) {
+/*
                 if (record.data.length != 171) {
                     EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKOUT_TRANSACTION_EXPECTING_171_BYTES);
                     return callback(new Error("Sorry! This is an invalid Data Packet for Checkout Transaction. Expecting 171 bytes.", null));
@@ -298,68 +299,79 @@ exports.checkOutCommunicationService=function (record,cb) {
                     EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
                     return callback(new Error("Sorry! It looks like you tapped on an open port", null));
                 }
-                var bicycleId = record.data.slice(21, 37);
-                Vehicle.findOne({'vehicleRFID':bicycleId},function (err,result) {
+*/
+                userId = record.data.slice(5, 21);
+                User.findOne({'smartCardNumber':userId}).lean().exec(function (err,result) {
                     if(err)
                     {
                         return callback(err,null);
                     }
                     if (!result) {
-                        EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
-                        return callback(new Error("Sorry! Bicycle with that RFID does not exist or is not available. Contact admin immediately."), null);
+                        EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+                        return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
                     }
-                    /*if(result.vehicleCurrentStatus!=Constants.VehicleLocationStatus.WITH_PORT)
+                    if(result._type=='member')
                     {
-                        EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
-                        return callback(new Error("Sorry! Bicycle with that RFID does not exist or is not available. Contact admin immediately."), null);
-                    }*/
-                    //record.vehicleRFID = result.vehicleRFID;
-                    record.vehicleRFID = '';
-                    record.vehicleUid = result.vehicleUid;
-                    record.vehicleid=result._id;
+                        /* var memberBalance = result.creditBalance;
+                         var octalString = exports.generateControlNumber(memberBalance, 4);*/
+                        balance = zeroPad(result.creditBalance,4);
+                        //console.log('Balance : '+balance);
+                        if (!result.status == Constants.MemberStatus.REGISTERED) {
+                            EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                            return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
+                        }
+
+                        /*if(result.vehicleId.length>0)
+                         {
+                         EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
+                         return callback(new Error("Sorry! It looks like your previous transaction is not completed"));
+                         }*/
+
+                        if (Number(result.creditBalance) <= 5) {
+                            EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                            return callback(new Error("Sorry! You don't have sufficient balance"));
+                        }
+                        //console.log(userDetails.smartCardKey);
+                        //keyUser = userDetails.smartCardKey;
+                        //console.log(keyUser);
+                        var validity = moment(result.validity);
+                        var current = moment();
+                        var days = moment.duration(validity.diff(current));
+                        var duration = days.asDays();
+                        if(duration<0)
+                        {
+                            EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                            return callback(new Error("Sorry! It looks like your validity has expired"),null);
+                        }
+                        userDetails = result;
+                        record.UserID=result.UserID;
+                        record.cardRFID=result.smartCardNumber;
+                    }
                     return callback(null, result);
                 });
+
             }
         ,
         function (callback) {
-            userId = record.data.slice(5, 21);
-            User.findOne({'smartCardNumber':userId}).lean().exec(function (err,result) {
+            var bicycleId = record.data.slice(21, 37);
+            Vehicle.findOne({'vehicleRFID':bicycleId},function (err,result) {
                 if(err)
                 {
                     return callback(err,null);
                 }
                 if (!result) {
-                    EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
-                    return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
+                    EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
+                    return callback(new Error("Sorry! Bicycle with that RFID does not exist or is not available. Contact admin immediately."), null);
                 }
-                if(result._type=='member')
-                {
-                   /* var memberBalance = result.creditBalance;
-                    var octalString = exports.generateControlNumber(memberBalance, 4);*/
-                    balance = zeroPad(result.creditBalance,4);
-                    //console.log('Balance : '+balance);
-                    if (!result.status == Constants.MemberStatus.REGISTERED) {
-                        EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
-                        return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
-                    }
-
-                    /*if(result.vehicleId.length>0)
-                    {
-                        EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
-                        return callback(new Error("Sorry! It looks like your previous transaction is not completed"));
-                    }*/
-
-                    if (Number(result.creditBalance) <= 5) {
-                        EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
-                        return callback(new Error("Sorry! You don't have sufficient balance"));
-                    }
-                    //console.log(userDetails.smartCardKey);
-                    //keyUser = userDetails.smartCardKey;
-                    //console.log(keyUser);
-                    userDetails = result;
-                    record.UserID=result.UserID;
-                    record.cardRFID=result.smartCardNumber;
-                }
+                /*if(result.vehicleCurrentStatus!=Constants.VehicleLocationStatus.WITH_PORT)
+                 {
+                 EventLoggersHandler.logger.error(Messages.BICYCLE_WITH_THAT_RFID_DOES_NOT_EXIST_OR_IS_NOT_AVAILABLE_CONTACT_ADMIN_IMMEDIATELY);
+                 return callback(new Error("Sorry! Bicycle with that RFID does not exist or is not available. Contact admin immediately."), null);
+                 }*/
+                //record.vehicleRFID = result.vehicleRFID;
+                record.vehicleRFID = '';
+                record.vehicleUid = result.vehicleUid;
+                record.vehicleid=result._id;
                 return callback(null, result);
             });
 
