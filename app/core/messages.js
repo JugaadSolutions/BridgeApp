@@ -1,6 +1,7 @@
 module.exports = {
 
 
+    YOU_ALREADY_BICYCLE_TAKEN:"You have already taken a bicycle",
     FLEET_FULL:"Fleet is full",
     RECORD_EXISTS:"Record already exists",
     // User facing messages

@@ -215,6 +215,7 @@ var RxQueue = queue(1, function(task, done) {
                             ports[i].clientPort = result.clientPort;
                             portProcessor.updatePort(ports[i], result.stepNo, cycle[j],keyUser, function (err, result) {
                                 if (err) {
+
                                     console.log('Error in Port Processing');
                                     done();
                                     return;
@@ -255,9 +256,46 @@ var RxQueue = queue(1, function(task, done) {
                 portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
 
                     if (err) {
-                        console.log('Error in Port Processing');
-                        done();
-                        return;
+
+                        if(err.name=='Trans')
+                        {
+                                var unit = err.unit;
+                                var port = err.port;
+                                var clientPort= err.clientPort;
+                                var clientHost= err.clientHost;
+
+                                var data = '/A0' + unit + port + 'B00000000000~';
+                                var transPacket = {
+                                    data: data,
+                                    clientPort: err.clientPort,
+                                    clientHost: err.clientHost
+                                };
+                                TxQueue.push(transPacket);
+                                var time = 2000;
+                                console.log('Please Verify your card at KIOSK');
+                                setTimeout(function () {
+                                    var unit = unit;
+                                    var port = port;
+                                    var data = '/A0' + unit + port + '100000000000~';
+                                    var transactionPacket = {
+                                        data: data,
+                                        clientPort: clientPort,
+                                        clientHost: clientHost
+                                    };
+                                    TxQueue.push(transactionPacket);
+                                }, time,clientPort,clientHost,unit,port);
+                                done();
+                                return console.error(err.message.toString());
+
+                        }
+
+                        else
+                        {
+                            console.log('Error in Port Processing');
+                            done();
+                            return;
+                        }
+
                     }
 
 

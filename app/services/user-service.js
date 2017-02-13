@@ -43,6 +43,12 @@ exports.userVerify = function (id,callback) {
 
                 return callback(new Error("Sorry! You don't have sufficient balance"),1,null);
             }
+            if(result.vehicleId.length>0)
+            {
+                EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
+                return callback(new Error("Sorry! It looks like your previous transaction is not completed"),1,null);
+            }
+
             var validity = moment(result.validity);
             var current = moment();
             var days = moment.duration(validity.diff(current));
@@ -321,11 +327,17 @@ exports.checkOutCommunicationService=function (record,cb) {
                             return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
                         }
 
-                        /*if(result.vehicleId.length>0)
+                        if(result.vehicleId.length>0)
                          {
                          EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
-                         return callback(new Error("Sorry! It looks like your previous transaction is not completed"));
-                         }*/
+                             var error = new Error("Sorry! It looks like your previous transaction is not completed");
+                             error.name='Trans';
+                             error.unit=record.FPGA;
+                             error.port=record.ePortNumber;
+                             error.clientHost = record.clientHost;
+                             error.clientPort = record.clientPort;
+                         return callback(error,null);
+                         }
 
                         if (Number(result.creditBalance) <= 5) {
                             EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);

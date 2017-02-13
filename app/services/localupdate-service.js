@@ -202,7 +202,7 @@ exports.updateDBcheckin = function (record,cb) {
                 return callback(null,result);
             });
 
-        },/*
+        },
         function(callback)
         {
             if(vehicleData.vehicleCurrentStatus==Constants.VehicleLocationStatus.WITH_MEMBER) {
@@ -247,7 +247,7 @@ exports.updateDBcheckin = function (record,cb) {
                 return callback(null,null);
             }
 
-        },*/
+        },
         function (callback) {
             console.log('Checkin to : Unit '+record.FPGA+' ePortNumber : '+record.ePortNumber);
             Port.findOne({'PortID':record.PortID}).lean().exec(function (err,result) {
@@ -343,7 +343,7 @@ exports.updateDBcheckin = function (record,cb) {
                 transactionResultDetails = result;
                 return callback(null, result);
             });
-        }/*,
+        },
         function (callback) {
             if(!userDetails)
             {
@@ -405,7 +405,6 @@ exports.updateDBcheckin = function (record,cb) {
                 });
             }
         }
-*/
     ],function (err,result) {
         if(err)
         {
