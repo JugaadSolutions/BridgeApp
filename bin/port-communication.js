@@ -41,7 +41,7 @@ setInterval(function () {
         PollPacketIndex = 0;
 
     TxQueue.push(PollPackets[PollPacketIndex++]);
-},30000);
+},10000);
 
 var UpdateQueue = queue(1,function (task, done) {
 
