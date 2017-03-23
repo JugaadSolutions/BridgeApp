@@ -258,7 +258,7 @@ exports.checkOutCommunicationService=function (record,cb) {
     var balance;
     var userId;
     var userDetails;
-    async.series([
+    async.waterfall([
         function (callback) {
             if (record.data.length != 171) {
                 EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKOUT_TRANSACTION_EXPECTING_171_BYTES);
@@ -292,9 +292,9 @@ exports.checkOutCommunicationService=function (record,cb) {
                 EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_EMPTY);
                 return callback(new Error(Messages.DOCKING_PORT_IS_EMPTY), null);
             }
-            return callback(null,null);
+            return callback(null,record);
         },
-            function (callback) {
+            function (record,callback) {
 /*
                 if (record.data.length != 171) {
                     EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKOUT_TRANSACTION_EXPECTING_171_BYTES);
@@ -364,7 +364,7 @@ exports.checkOutCommunicationService=function (record,cb) {
 
             }
         ,
-        function (callback) {
+        function (result,callback) {
             var bicycleId = record.data.slice(21, 37);
             Vehicle.findOne({'vehicleRFID':bicycleId},function (err,result) {
                 if(err)
@@ -388,7 +388,7 @@ exports.checkOutCommunicationService=function (record,cb) {
             });
 
         },
-        function (callback) {
+        function (result,callback) {
             var stepNumber = 4;
 
             bicycleCheckOutStatus = 1;
@@ -412,7 +412,7 @@ exports.checkOutCommunicationService=function (record,cb) {
             record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 56, 88, userReadData);
 
             record.portStatus= Constants.AvailabilityStatus.TRANSITION;
-            return callback(null, null);
+            return callback(null, record);
         }
     ],function (err,results) {
         if(err)
@@ -466,7 +466,7 @@ exports.checkInCommunicationService = function (eport, cb) {
                 }
                 else
                 {
-                    return callback(null,eport);
+                    return callback(null,null);
                 }
 
             }/*,

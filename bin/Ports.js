@@ -10,6 +10,7 @@ var Stations = require('../app/models/station'),
 
     config = require('config');
 exports.getPorts = function (callback) {
+
     Stations.findOne({'name': config.get('stationName')},function (err, res) {
         if (err) {
             console.log('Station error');

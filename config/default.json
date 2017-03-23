@@ -7,7 +7,7 @@
     "host": "0.0.0.0"
   },
   "serverBridge": {
-    "baseUrl": "http://13.13.13.1:13056/api/"
+    "baseUrl": "http://13.13.13.1:13060/api/"
   },
   "db": {
     "host": "localhost",

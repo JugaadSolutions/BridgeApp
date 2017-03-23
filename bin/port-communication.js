@@ -27,10 +27,10 @@ udpServer.on('error', function (err) {
 
 
 var PollPackets = [
-    {"data":"/5030000000000000~","clientPort":"1024","clientHost":"13.13.12.3"},
-    {"data":"/5040000000000000~","clientPort":"1024","clientHost":"13.13.12.4"},
-    {"data":"/5050000000000000~","clientPort":"1024","clientHost":"13.13.12.5"},
-    {"data":"/5060000000000000~","clientPort":"1024","clientHost":"13.13.12.6"}
+    {"data":"/5030000000000000~","clientPort":"1024","clientHost":"13.13.14.3"},
+    {"data":"/5040000000000000~","clientPort":"1024","clientHost":"13.13.14.4"},
+    {"data":"/5050000000000000~","clientPort":"1024","clientHost":"13.13.14.5"},
+    {"data":"/5060000000000000~","clientPort":"1024","clientHost":"13.13.14.6"}
 ];
 
 var PollPacketIndex = 0;
@@ -297,7 +297,10 @@ var RxQueue = queue(1, function(task, done) {
                         }
 
                     }
-
+                    if(result==null)
+                    {
+                        done();
+                    }
 
                     if ((result.data[1] != 7) && (result.data[1] != 6)) {
                         if(result.data[1] == 4){
