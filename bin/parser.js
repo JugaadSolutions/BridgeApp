@@ -42,6 +42,6 @@ exports.packetParser=function (UDPPacketInfo,callback) {
     };
 
     //console.log(packetInfo);
-    callback(null,packetInfo);
+   return callback(null,packetInfo);
 
 };

@@ -12,6 +12,7 @@ setInterval(function(){
             if(conn==1)
             {
                 //console.log(obj);
+                require('./bin/userArray');
                 require('./bin/eport');
                 require('./bin/eMemberPlans');
                 require('./bin/pbs-bridge');

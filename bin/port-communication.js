@@ -1,6 +1,8 @@
 require('./parser');
 require('../bin/pbs-bridge');
 var queue = require('block-queue');
+var user = require('../app/models/user');
+var Vehicle = require('../app/models/vehicle');
 var dgram = require('dgram'),
     config = require('config'),
     Messages = require('../app/core/messages'),
@@ -14,8 +16,10 @@ var Parser =require('./parser');
 var eport = require('./eport');
 var portProcessor = require('./port-processing');
 var ports=[];
+var usersArray=[];
 var clientHost, clientPort;
-
+var uA = require('./userArray');
+usersArray = uA;
 udpServer.on('error', function (err) {
 
     console.error(err);
@@ -35,13 +39,13 @@ var PollPackets = [
 
 var PollPacketIndex = 0;
 
-setInterval(function () {
+/*setInterval(function () {
 
     if(PollPacketIndex >= 4 )
         PollPacketIndex = 0;
 
     TxQueue.push(PollPackets[PollPacketIndex++]);
-},10000);
+},10000);*/
 
 var UpdateQueue = queue(1,function (task, done) {
 
@@ -69,7 +73,7 @@ var UpdateQueue = queue(1,function (task, done) {
                 TxQueue.push(transactionPacket);
             },time);
             console.log('Updation Successful :'+msg);
-            done();
+           // done();
         });
 
     }
@@ -132,11 +136,11 @@ var UpdateQueue = queue(1,function (task, done) {
                 };
                 TxQueue.push(transactionPacket);
             },time);
-            done();
+            //done();
         });
 
     }
-
+    done();
 });
 
 var RxQueue = queue(1, function(task, done) {
@@ -148,253 +152,795 @@ var RxQueue = queue(1, function(task, done) {
             done();
             // return responseToClient(null, err, clientHost, clientPort);
         }
-
-        if (result.stepNo == 1) {
-            UserService.userVerify(result.data.slice(5, 21),function (err,eid,userdetails) {
-                if(err)
-                {
-                    if(eid==1) {
-                        var unit = result.FPGA;
-                        var port = result.ePortNumber;
-                        var data = '/A0' + unit + port + 'B00000000000~';
-                        var transPacket = {
-                            data: data,
-                            clientPort: task.clientPort,
-                            clientHost: task.clientHost
-                        };
-                        TxQueue.push(transPacket);
-                        var time = 2000;
-                        console.log('Please Verify your card at KIOSK');
-                        setTimeout(function () {
-                            var unit = result.FPGA;
-                            var port = result.ePortNumber;
-                            var data = '/A0' + unit + port + '100000000000~';
-                            var transactionPacket = {
-                                data: data,
-                                clientPort: result.clientPort,
-                                clientHost: result.clientHost
-                            };
-                            TxQueue.push(transactionPacket);
-                        }, time);
-                        return console.error(err.message.toString());
-                        done();
-                    }else {
-                        console.log('Error Parsing Packet');
-                        return console.error(err.message.toString());
-                        done();
-                    }
-                }
-                keyUser = userdetails.smartCardKey;
-            });
-        }
-
-            ports = eport;
-        if (result.stepNo == 6) {           //poll response
-            var portNumber = [];
-            var cycle = [];
-
-            portNumber.push(result.data.slice(4, 5));
-            cycle.push(result.data.slice(5, 21));
-
-            portNumber.push(result.data.slice(21, 22));
-            cycle.push(result.data.slice(22, 38));
-
-            portNumber.push(result.data.slice(38, 39));
-            cycle.push(result.data.slice(39, 55));
-
-            portNumber.push(result.data.slice(55, 56));
-            cycle.push(result.data.slice(56, 72));
-
-            for (var i = 0; i < ports.length; i++) {
-                if (ports[i].FPGA == result.FPGA ) {
-
-                    for (var j = 0; j < 4; j++) {
-
-                        if (ports[i].ePortNumber == portNumber[j]) {
-                            ports[i].clientHost = result.clientHost;
-                            ports[i].clientPort = result.clientPort;
-                            portProcessor.updatePort(ports[i], result.stepNo, cycle[j],keyUser, function (err, result) {
-                                if (err) {
-
-                                    console.log('Error in Port Processing');
-                                    done();
-                                    return;
-                                }
-                                var transactionPacket = {
-                                    data: result.data,
-                                    clientPort: result.clientPort,
-                                    clientHost: result.clientHost
-                                };
-                                TxQueue.push(transactionPacket);
-                            });
-                        }
-                    }
-
-                }
-
-            }
-           // done();
-        }
-        else {      //steps: 1,3,7
-        for (var i = 0; i < ports.length; i++) {
-            if (ports[i].FPGA == result.FPGA && ports[i].ePortNumber == result.ePortNumber) {
-                ports[i].clientHost = result.clientHost;
-                ports[i].clientPort = result.clientPort;
-
-                if (result.stepNo == 7) {
-                    var unit = result.FPGA;
-                    var port = result.ePortNumber;
-                    var data = '/A0' + unit + port + '200000000000~';
-                    var transPacket = {
-                        data: data,
-                        clientPort: task.clientPort,
-                        clientHost: task.clientHost
-                    };
-                    TxQueue.push(transPacket);
-                }
-                //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
-                portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
-
-                    if (err) {
-
-                        if(err.name=='Trans')
+        //Checking the array for already checked out user to avoid multiple checkout
+                ports = eport;
+                if (result.stepNo == 1) {
+                    UserService.userVerify(result.data.slice(5, 21),function (err,eid,userdetails) {
+                        if(err)
                         {
-                                var unit = err.unit;
-                                var port = err.port;
-                                var clientPort= err.clientPort;
-                                var clientHost= err.clientHost;
-
+                            if(eid==1) {
+                                var unit = result.FPGA;
+                                var port = result.ePortNumber;
                                 var data = '/A0' + unit + port + 'B00000000000~';
                                 var transPacket = {
                                     data: data,
-                                    clientPort: err.clientPort,
-                                    clientHost: err.clientHost
+                                    clientPort: task.clientPort,
+                                    clientHost: task.clientHost
                                 };
                                 TxQueue.push(transPacket);
                                 var time = 2000;
                                 console.log('Please Verify your card at KIOSK');
                                 setTimeout(function () {
-                                    var unit = unit;
-                                    var port = port;
+                                    var unit = result.FPGA;
+                                    var port = result.ePortNumber;
                                     var data = '/A0' + unit + port + '100000000000~';
                                     var transactionPacket = {
                                         data: data,
-                                        clientPort: clientPort,
-                                        clientHost: clientHost
+                                        clientPort: result.clientPort,
+                                        clientHost: result.clientHost
                                     };
                                     TxQueue.push(transactionPacket);
-                                }, time,clientPort,clientHost,unit,port);
-                                done();
+                                }, time);
                                 return console.error(err.message.toString());
-
+                                done();
+                            }else {
+                                console.log('Error Parsing Packet');
+                                return console.error(err.message.toString());
+                                done();
+                            }
                         }
-
-                        else
+                        if(result)
                         {
-                            console.log('Error in Port Processing');
-                            done();
-                            return;
+                            keyUser = userdetails.smartCardKey;
+                            for(var i = 0; i < ports.length; i++) {
+                                if (ports[i].FPGA == result.FPGA && ports[i].ePortNumber == result.ePortNumber) {
+                                    ports[i].clientHost = result.clientHost;
+                                    ports[i].clientPort = result.clientPort;
+                                    if(ports[i].portStatus!=Constants.AvailabilityStatus.TRANSITION)
+                                    {
+                                        portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
+                                            if (err) {
+
+                                                if(err.name=='Trans')
+                                                {
+                                                    var unit = err.unit;
+                                                    var port = err.port;
+                                                    var clientPort= err.clientPort;
+                                                    var clientHost= err.clientHost;
+
+                                                    var data = '/A0' + unit + port + 'B00000000000~';
+                                                    var transPacket = {
+                                                        data: data,
+                                                        clientPort: err.clientPort,
+                                                        clientHost: err.clientHost
+                                                    };
+                                                    TxQueue.push(transPacket);
+                                                    var time = 2000;
+                                                    console.log('Please Verify your card at KIOSK');
+                                                    setTimeout(function () {
+                                                        var unit = unit;
+                                                        var port = port;
+                                                        var data = '/A0' + unit + port + '100000000000~';
+                                                        var transactionPacket = {
+                                                            data: data,
+                                                            clientPort: clientPort,
+                                                            clientHost: clientHost
+                                                        };
+                                                        TxQueue.push(transactionPacket);
+                                                    }, time,clientPort,clientHost,unit,port);
+                                                    done();
+                                                    return console.error(err.message.toString());
+
+                                                }
+
+                                                else
+                                                {
+                                                    console.log('Error in Port Processing');
+                                                    done();
+                                                    return;
+                                                }
+
+                                            }
+                                            var transactionPacket = {
+                                                data: result.data,
+                                                clientPort: result.clientPort,
+                                                clientHost: result.clientHost
+                                            };
+                                            TxQueue.push(transactionPacket);
+                                            done();
+                                        });
+                                    }
+
+                                }
+                            }
                         }
 
-                    }
-                    if(result==null)
-                    {
-                        done();
-                    }
+                    });
+                    done();
+                }
+                else if (result.stepNo == 6) {           //poll response
+                    var portNumber = [];
+                    var cycle = [];
 
-                    if ((result.data[1] != 7) && (result.data[1] != 6)) {
-                        if(result.data[1] == 4){
-                            var transactionPacket = {
-                                data: result.data,
-                                clientPort: result.clientPort,
-                                clientHost: result.clientHost
-                            };
-                            TxQueue.push(transactionPacket);
-                            setTimeout(function () {
-                                var f= result.FPGA;
-                                var p= result.ePortNumber;
-                                for (var i = 0; i < ports.length; i++) {
-                                    if (ports[i].FPGA == f && ports[i].ePortNumber == p) {
-                                        if(ports[i].portStatus==Constants.AvailabilityStatus.TRANSITION)
-                                        {
-                                            ports[i].portStatus=Constants.AvailabilityStatus.EMPTY;
-                                            break;
-                                        }
+                    portNumber.push(result.data.slice(4, 5));
+                    cycle.push(result.data.slice(5, 21));
+
+                    portNumber.push(result.data.slice(21, 22));
+                    cycle.push(result.data.slice(22, 38));
+
+                    portNumber.push(result.data.slice(38, 39));
+                    cycle.push(result.data.slice(39, 55));
+
+                    portNumber.push(result.data.slice(55, 56));
+                    cycle.push(result.data.slice(56, 72));
+
+                    for (var i = 0; i < ports.length; i++) {
+                        if (ports[i].FPGA == result.FPGA ) {
+
+                            for (var j = 0; j < 4; j++) {
+
+                                if (ports[i].ePortNumber == portNumber[j]) {
+                                    ports[i].clientHost = result.clientHost;
+                                    ports[i].clientPort = result.clientPort;
+                                    if(ports[i].portStatus!=Constants.AvailabilityStatus.TRANSITION) {
+                                        portProcessor.updatePort(ports[i], result.stepNo, cycle[j], keyUser, function (err, result) {
+                                            if (err) {
+
+                                                console.log('Error in Port Processing');
+                                                done();
+                                                return;
+                                            }
+                                            var transactionPacket = {
+                                                data: result.data,
+                                                clientPort: result.clientPort,
+                                                clientHost: result.clientHost
+                                            };
+                                            TxQueue.push(transactionPacket);
+                                        });
                                     }
                                 }
-                            },10000);
-                        }
-                        else if(result.data[0]!='/')
-                        {
+                            }
 
+                        }
+
+                    }
+                    done();
+                }
+                else if (result.stepNo == 3) {
+                    for(var u=0;u<usersArray.length;u++) {
+                        if (usersArray[u] == result.data.slice(5, 21)) {
+                            done();
+                            break;
                         }
                         else
                         {
-                            var transactionPacket = {
-                                data: result.data,
-                                clientPort: result.clientPort,
-                                clientHost: result.clientHost
-                            };
-                            TxQueue.push(transactionPacket);
-                        }
+                            for(var i = 0; i < ports.length; i++) {
+                                if (ports[i].FPGA == result.FPGA && ports[i].ePortNumber == result.ePortNumber) {
+                                    ports[i].clientHost = result.clientHost;
+                                    ports[i].clientPort = result.clientPort;
+                                    portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
+                                        if (err) {
 
+                                            if(err.name=='Trans')
+                                            {
+                                                var unit = err.unit;
+                                                var port = err.port;
+                                                var clientPort= err.clientPort;
+                                                var clientHost= err.clientHost;
+
+                                                var data = '/A0' + unit + port + 'B00000000000~';
+                                                var transPacket = {
+                                                    data: data,
+                                                    clientPort: err.clientPort,
+                                                    clientHost: err.clientHost
+                                                };
+                                                TxQueue.push(transPacket);
+                                                var time = 2000;
+                                                console.log('Please Verify your card at KIOSK');
+                                                setTimeout(function () {
+                                                    var unit = unit;
+                                                    var port = port;
+                                                    var data = '/A0' + unit + port + '100000000000~';
+                                                    var transactionPacket = {
+                                                        data: data,
+                                                        clientPort: clientPort,
+                                                        clientHost: clientHost
+                                                    };
+                                                    TxQueue.push(transactionPacket);
+                                                }, time,clientPort,clientHost,unit,port);
+                                                done();
+                                                return console.error(err.message.toString());
+
+                                            }
+
+                                            else
+                                            {
+                                                console.log('Error in Port Processing');
+                                                done();
+                                                return;
+                                            }
+
+                                        }
+                                                var transactionPacket = {
+                                                    data: result.data,
+                                                    clientPort: result.clientPort,
+                                                    clientHost: result.clientHost
+                                                };
+                                                usersArray.push(result.data.slice(5, 21));
+                                                TxQueue.push(transactionPacket);
+                                                setTimeout(function () {
+                                                    var f= result.FPGA;
+                                                    var p= result.ePortNumber;
+                                                    for (var i = 0; i < ports.length; i++) {
+                                                        if (ports[i].FPGA == f && ports[i].ePortNumber == p) {
+                                                            if(ports[i].portStatus==Constants.AvailabilityStatus.TRANSITION)
+                                                            {
+                                                                ports[i].portStatus=Constants.AvailabilityStatus.EMPTY;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                },10000);
+                                                var obj = {
+                                                    type: 'checkout',
+                                                    PortID: result.PortID,
+                                                    FPGA: result.FPGA,
+                                                    ePortNumber: result.ePortNumber,
+                                                    UserID: result.UserID,
+                                                    cardRFID: result.cardRFID,
+                                                    vehicleid: result.vehicleid,
+                                                    vehicleRFID: result.vehicleRFId,
+                                                    vehicleUid: result.vehicleUid,
+                                                    portStatus: Constants.AvailabilityStatus.EMPTY,
+                                                    clientPort: result.clientPort,
+                                                    clientHost: result.clientHost
+                                                };
+                                                UpdateQueue.push(obj);
+                                                Vehicle.findOne({vehicleUid:result.vehicleUid},function (err, vehicleDetails) {
+                                                    if (err) {
+                                                        console.error('Error finding cycle in port-comm : '+err);
+                                                    }
+                                                    user.findOne({smartCardNumber: result.cardRFID},function (err,result) {
+                                                        if (err) {
+                                                            console.error('Error finding User in port-comm : '+err);
+                                                        }
+                                                        var vehicleInfo = {
+                                                            vehicleid: vehicleDetails._id,
+                                                            vehicleUid: vehicleDetails.vehicleUid
+                                                        };
+                                                        result.vehicleId.push(vehicleInfo);
+                                                        user.findByIdAndUpdate(result._id, result,function (err,userUpdated) {
+                                                            if (err) {
+                                                                console.error('Error updating User in port-comm : '+err);
+                                                            }
+                                                            for(var i=0;i<usersArray.length;i++)
+                                                            {
+                                                                if(userUpdated.smartCardNumber==usersArray[i])
+                                                                {
+                                                                    usersArray.splice(i,1);
+                                                                }
+                                                                if(i==usersArray.length-1)
+                                                                {
+                                                                    done();
+                                                                    break;
+                                                                }
+                                                            }
+                                                            console.log('User Updated in port-comm');
+                                                            // userUpdatedDetails = result;
+                                                        });
+                                                    });
+                                                });
+                                    });
+                                }
+                            }
+                            break;
+                        }
                     }
+                }
+                else if (result.stepNo == 7) {
+                    for(var i = 0; i < ports.length; i++) {
+                        if (ports[i].FPGA == result.FPGA && ports[i].ePortNumber == result.ePortNumber) {
+                            ports[i].clientHost = result.clientHost;
+                            ports[i].clientPort = result.clientPort;
+                            if(ports[i].portStatus!=Constants.AvailabilityStatus.TRANSITION)
+                            {
+                                portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
+                                    if (err) {
 
-                    //eport.data='/A051030000000000~';
+                                        if(err.name=='Trans')
+                                        {
+                                            var unit = err.unit;
+                                            var port = err.port;
+                                            var clientPort= err.clientPort;
+                                            var clientHost= err.clientHost;
 
+                                            var data = '/A0' + unit + port + 'B00000000000~';
+                                            var transPacket = {
+                                                data: data,
+                                                clientPort: err.clientPort,
+                                                clientHost: err.clientHost
+                                            };
+                                            TxQueue.push(transPacket);
+                                            var time = 2000;
+                                            console.log('Please Verify your card at KIOSK');
+                                            setTimeout(function () {
+                                                var unit = unit;
+                                                var port = port;
+                                                var data = '/A0' + unit + port + '100000000000~';
+                                                var transactionPacket = {
+                                                    data: data,
+                                                    clientPort: clientPort,
+                                                    clientHost: clientHost
+                                                };
+                                                TxQueue.push(transactionPacket);
+                                            }, time,clientPort,clientHost,unit,port);
+                                            done();
+                                            return console.error(err.message.toString());
 
-                    if (result.data[1] == 4 || result.data[1] == 7) {
-                        var updateObj = {};
-                        if (result.data[1] == 4) {
-                            var obj = {
-                                type: 'checkout',
-                                PortID: result.PortID,
-                                FPGA: result.FPGA,
-                                ePortNumber: result.ePortNumber,
-                                UserID: result.UserID,
-                                cardRFID: result.cardRFID,
-                                vehicleid: result.vehicleid,
-                                vehicleRFID: result.vehicleRFId,
-                                vehicleUid: result.vehicleUid,
-                                portStatus: Constants.AvailabilityStatus.EMPTY,
-                                clientPort: result.clientPort,
-                                clientHost: result.clientHost
-                            };
+                                        }
 
-                            //updateObj = obj;
-                            UpdateQueue.push(obj);
-                            done();
+                                        else
+                                        {
+                                            console.log('Error in Port Processing');
+                                            done();
+                                            return;
+                                        }
+
+                                    }
+                                    var obj = {
+                                        type: 'checkin',
+                                        PortID: result.PortID,
+                                        FPGA: result.FPGA,
+                                        ePortNumber: result.ePortNumber,
+                                        UserID: result.UserID,
+                                        cardRFID: result.cardRFID,
+                                        vehicleRFId: result.vehicleRFId,
+                                        vehicleUid: result.vehicleUid,
+                                        portStatus: result.portStatus,
+                                        clientPort: result.clientPort,
+                                        clientHost: result.clientHost
+                                    };
+                                    UpdateQueue.push(obj);
+                                    done();
+                                });
+                            }
 
                         }
-                        else {
-                            var obj = {
-                                type: 'checkin',
-                                PortID: result.PortID,
-                                FPGA: result.FPGA,
-                                ePortNumber: result.ePortNumber,
-                                UserID: result.UserID,
-                                cardRFID: result.cardRFID,
-                                vehicleRFId: result.vehicleRFId,
-                                vehicleUid: result.vehicleUid,
-                                portStatus: result.portStatus,
-                                clientPort: result.clientPort,
-                                clientHost: result.clientHost
-                            };
-
-                            UpdateQueue.push(obj);
-                            done();
-                        }
-                        //UpdateQueue.push(updateObj);
-                        // done();
                     }
+                }
+                else if (result.stepNo == 9){
+                    for(var i = 0; i < ports.length; i++) {
+                        if (ports[i].FPGA == result.FPGA && ports[i].ePortNumber == result.ePortNumber) {
+                            ports[i].clientHost = result.clientHost;
+                            ports[i].clientPort = result.clientPort;
+                                portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
+                                    if (err) {
 
-                });
-                break;
-            }
-        }
-    }
+                                        if(err.name=='Trans')
+                                        {
+                                            var unit = err.unit;
+                                            var port = err.port;
+                                            var clientPort= err.clientPort;
+                                            var clientHost= err.clientHost;
+
+                                            var data = '/A0' + unit + port + 'B00000000000~';
+                                            var transPacket = {
+                                                data: data,
+                                                clientPort: err.clientPort,
+                                                clientHost: err.clientHost
+                                            };
+                                            TxQueue.push(transPacket);
+                                            var time = 2000;
+                                            console.log('Please Verify your card at KIOSK');
+                                            setTimeout(function () {
+                                                var unit = unit;
+                                                var port = port;
+                                                var data = '/A0' + unit + port + '100000000000~';
+                                                var transactionPacket = {
+                                                    data: data,
+                                                    clientPort: clientPort,
+                                                    clientHost: clientHost
+                                                };
+                                                TxQueue.push(transactionPacket);
+                                            }, time,clientPort,clientHost,unit,port);
+                                            done();
+                                            return console.error(err.message.toString());
+
+                                        }
+
+                                        else
+                                        {
+                                            console.log('Error in Port Processing');
+                                            done();
+                                            return;
+                                        }
+
+                                    }
+                                    var transactionPacket = {
+                                        data: result.data,
+                                        clientPort: result.clientPort,
+                                        clientHost: result.clientHost
+                                    };
+                                    TxQueue.push(transactionPacket);
+                                    done();
+                                });
+                        }
+                    }
+                }
+                else {
+                    /*for (var i = 0; i < ports.length; i++) {
+                        if (ports[i].FPGA == result.FPGA && ports[i].ePortNumber == result.ePortNumber) {
+                            ports[i].clientHost = result.clientHost;
+                            ports[i].clientPort = result.clientPort;
+
+                            if (result.stepNo == 7) {
+                                var unit = result.FPGA;
+                                var port = result.ePortNumber;
+                                var data = '/A0' + unit + port + '200000000000~';
+                                var transPacket = {
+                                    data: data,
+                                    clientPort: task.clientPort,
+                                    clientHost: task.clientHost
+                                };
+                                TxQueue.push(transPacket);      //for udp communication
+
+                                var obj = {
+                                    type: 'checkin',
+                                    PortID: result.PortID,
+                                    FPGA: result.FPGA,
+                                    ePortNumber: result.ePortNumber,
+                                    UserID: result.UserID,
+                                    cardRFID: result.cardRFID,
+                                    vehicleRFId: result.vehicleRFId,
+                                    vehicleUid: result.vehicleUid,
+                                    portStatus: result.portStatus,
+                                    clientPort: result.clientPort,
+                                    clientHost: result.clientHost
+                                };
+
+                                UpdateQueue.push(obj);              //database updation
+                                done();
+                            }
+                            //console.log('Matched to eport  :'+ports[i].ePortNumber+' FPGA :'+ports[i].FPGA);
+
+                           else if(result.stepNo==3)
+                            {
+                                for(var u=0;u<usersArray.length;u++) {
+                                    if (usersArray[u] == result.data.slice(5, 21)) {
+                                        done();
+                                        break;
+                                    }
+                                    else {
+                                        portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
+
+                                            if (err) {
+
+                                                if(err.name=='Trans')
+                                                {
+                                                    var unit = err.unit;
+                                                    var port = err.port;
+                                                    var clientPort= err.clientPort;
+                                                    var clientHost= err.clientHost;
+
+                                                    var data = '/A0' + unit + port + 'B00000000000~';
+                                                    var transPacket = {
+                                                        data: data,
+                                                        clientPort: err.clientPort,
+                                                        clientHost: err.clientHost
+                                                    };
+                                                    TxQueue.push(transPacket);
+                                                    var time = 2000;
+                                                    console.log('Please Verify your card at KIOSK');
+                                                    setTimeout(function () {
+                                                        var unit = unit;
+                                                        var port = port;
+                                                        var data = '/A0' + unit + port + '100000000000~';
+                                                        var transactionPacket = {
+                                                            data: data,
+                                                            clientPort: clientPort,
+                                                            clientHost: clientHost
+                                                        };
+                                                        TxQueue.push(transactionPacket);
+                                                    }, time,clientPort,clientHost,unit,port);
+                                                    done();
+                                                    return console.error(err.message.toString());
+
+                                                }
+
+                                                else
+                                                {
+                                                    console.log('Error in Port Processing');
+                                                    done();
+                                                    return;
+                                                }
+
+                                            }
+                                            if(result==null)
+                                            {
+                                                done();
+                                            }
+
+                                            if ((result.data[1] != 7) && (result.data[1] != 6)) {
+                                                if(result.data[1] == 4){
+                                                    var transactionPacket = {
+                                                        data: result.data,
+                                                        clientPort: result.clientPort,
+                                                        clientHost: result.clientHost
+                                                    };
+                                                    usersArray.push(result.data.slice(5, 21));
+                                                    TxQueue.push(transactionPacket);
+                                                    setTimeout(function () {
+                                                        var f= result.FPGA;
+                                                        var p= result.ePortNumber;
+                                                        for (var i = 0; i < ports.length; i++) {
+                                                            if (ports[i].FPGA == f && ports[i].ePortNumber == p) {
+                                                                if(ports[i].portStatus==Constants.AvailabilityStatus.TRANSITION)
+                                                                {
+                                                                    ports[i].portStatus=Constants.AvailabilityStatus.EMPTY;
+                                                                    break;
+                                                                }
+                                                            }
+                                                        }
+                                                    },10000);
+                                                }
+                                                else if(result.data[0]!='/')
+                                                {
+
+                                                }
+                                                else
+                                                {
+                                                    var transactionPacket = {
+                                                        data: result.data,
+                                                        clientPort: result.clientPort,
+                                                        clientHost: result.clientHost
+                                                    };
+                                                    TxQueue.push(transactionPacket);
+                                                }
+
+                                            }
+
+                                            //eport.data='/A051030000000000~';
+
+
+                                            if (result.data[1] == 4) {
+                                                var updateObj = {};
+                                                if (result.data[1] == 4) {
+                                                    var obj = {
+                                                        type: 'checkout',
+                                                        PortID: result.PortID,
+                                                        FPGA: result.FPGA,
+                                                        ePortNumber: result.ePortNumber,
+                                                        UserID: result.UserID,
+                                                        cardRFID: result.cardRFID,
+                                                        vehicleid: result.vehicleid,
+                                                        vehicleRFID: result.vehicleRFId,
+                                                        vehicleUid: result.vehicleUid,
+                                                        portStatus: Constants.AvailabilityStatus.EMPTY,
+                                                        clientPort: result.clientPort,
+                                                        clientHost: result.clientHost
+                                                    };
+                                                    Vehicle.findOne({vehicleUid:result.vehicleUid},function (err, vehicleDetails) {
+                                                        if (err) {
+                                                            console.error('Error finding cycle in port-comm : '+err);
+                                                        }
+                                                        user.findOne({smartCardNumber: result.cardRFID},function (err,result) {
+                                                            if (err) {
+                                                                console.error('Error finding User in port-comm : '+err);
+                                                            }
+                                                            var vehicleInfo = {
+                                                                vehicleid: vehicleDetails._id,
+                                                                vehicleUid: vehicleDetails.vehicleUid
+                                                            };
+                                                            result.vehicleId.push(vehicleInfo);
+                                                            user.findByIdAndUpdate(result._id, result,function (err,userUpdated) {
+                                                                if (err) {
+                                                                    console.error('Error updating User in port-comm : '+err);
+                                                                }
+                                                                for(var i=0;i<usersArray.length;i++)
+                                                                {
+                                                                    if(userUpdated.smartCardNumber==usersArray[i])
+                                                                    {
+                                                                        usersArray.splice(i,1);
+                                                                    }
+                                                                }
+                                                                console.log('User Updated in port-comm');
+                                                                // userUpdatedDetails = result;
+                                                            });
+                                                        });
+                                                    });
+                                                    //updateObj = obj;
+                                                    UpdateQueue.push(obj);
+                                                    done();
+
+                                                }
+
+                                                //UpdateQueue.push(updateObj);
+                                                // done();
+                                            }
+
+                                        });
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                            else
+                            {
+                                portProcessor.updatePort(ports[i], result.stepNo, result.data,keyUser, function (err, result) {
+
+                                    if (err) {
+
+                                        if(err.name=='Trans')
+                                        {
+                                            var unit = err.unit;
+                                            var port = err.port;
+                                            var clientPort= err.clientPort;
+                                            var clientHost= err.clientHost;
+
+                                            var data = '/A0' + unit + port + 'B00000000000~';
+                                            var transPacket = {
+                                                data: data,
+                                                clientPort: err.clientPort,
+                                                clientHost: err.clientHost
+                                            };
+                                            TxQueue.push(transPacket);
+                                            var time = 2000;
+                                            console.log('Please Verify your card at KIOSK');
+                                            setTimeout(function () {
+                                                var unit = unit;
+                                                var port = port;
+                                                var data = '/A0' + unit + port + '100000000000~';
+                                                var transactionPacket = {
+                                                    data: data,
+                                                    clientPort: clientPort,
+                                                    clientHost: clientHost
+                                                };
+                                                TxQueue.push(transactionPacket);
+                                            }, time,clientPort,clientHost,unit,port);
+                                            done();
+                                            return console.error(err.message.toString());
+
+                                        }
+
+                                        else
+                                        {
+                                            console.log('Error in Port Processing');
+                                            done();
+                                            return;
+                                        }
+
+                                    }
+                                    if(result==null)
+                                    {
+                                        done();
+                                    }
+
+                                    if ((result.data[1] != 7) && (result.data[1] != 6)) {
+                                        if(result.data[1] == 4){
+                                            var transactionPacket = {
+                                                data: result.data,
+                                                clientPort: result.clientPort,
+                                                clientHost: result.clientHost
+                                            };
+                                            TxQueue.push(transactionPacket);
+                                            setTimeout(function () {
+                                                var f= result.FPGA;
+                                                var p= result.ePortNumber;
+                                                for (var i = 0; i < ports.length; i++) {
+                                                    if (ports[i].FPGA == f && ports[i].ePortNumber == p) {
+                                                        if(ports[i].portStatus==Constants.AvailabilityStatus.TRANSITION)
+                                                        {
+                                                            ports[i].portStatus=Constants.AvailabilityStatus.EMPTY;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                            },10000);
+                                        }
+                                        else if(result.data[0]!='/')
+                                        {
+
+                                        }
+                                        else
+                                        {
+                                            var transactionPacket = {
+                                                data: result.data,
+                                                clientPort: result.clientPort,
+                                                clientHost: result.clientHost
+                                            };
+                                            TxQueue.push(transactionPacket);
+                                        }
+
+                                    }
+
+                                    //eport.data='/A051030000000000~';
+
+
+                                    if (result.data[1] == 4)  {
+                                        var updateObj = {};
+                                        if (result.data[1] == 4) {
+                                            var obj = {
+                                                type: 'checkout',
+                                                PortID: result.PortID,
+                                                FPGA: result.FPGA,
+                                                ePortNumber: result.ePortNumber,
+                                                UserID: result.UserID,
+                                                cardRFID: result.cardRFID,
+                                                vehicleid: result.vehicleid,
+                                                vehicleRFID: result.vehicleRFId,
+                                                vehicleUid: result.vehicleUid,
+                                                portStatus: Constants.AvailabilityStatus.EMPTY,
+                                                clientPort: result.clientPort,
+                                                clientHost: result.clientHost
+                                            };
+                                            Vehicle.findOne({vehicleUid:result.vehicleUid},function (err, vehicleDetails) {
+                                                if (err) {
+                                                    console.error('Error finding cycle in port-comm : '+err);
+                                                }
+                                                user.findOne({smartCardNumber: result.cardRFID},function (err,result) {
+                                                    if (err) {
+                                                        console.error('Error finding User in port-comm : '+err);
+                                                    }
+                                                    var vehicleInfo = {
+                                                        vehicleid: vehicleDetails._id,
+                                                        vehicleUid: vehicleDetails.vehicleUid
+                                                    };
+                                                    result.vehicleId.push(vehicleInfo);
+                                                    user.findByIdAndUpdate(result._id, result,function (err,userUpdated) {
+                                                        if (err) {
+                                                            console.error('Error updating User in port-comm : '+err);
+                                                        }
+                                                        for(var i=0;i<usersArray.length;i++)
+                                                        {
+                                                            if(userUpdated.smartCardNumber==usersArray[i])
+                                                            {
+                                                                usersArray.splice(i,1);
+                                                            }
+                                                        }
+                                                        console.log('User Updated in port-comm');
+                                                        // userUpdatedDetails = result;
+                                                    });
+                                                });
+                                            });
+                                            //updateObj = obj;
+                                            UpdateQueue.push(obj);
+                                            done();
+
+                                        }
+                                        else {
+                                            var obj = {
+                                                type: 'checkin',
+                                                PortID: result.PortID,
+                                                FPGA: result.FPGA,
+                                                ePortNumber: result.ePortNumber,
+                                                UserID: result.UserID,
+                                                cardRFID: result.cardRFID,
+                                                vehicleRFId: result.vehicleRFId,
+                                                vehicleUid: result.vehicleUid,
+                                                portStatus: result.portStatus,
+                                                clientPort: result.clientPort,
+                                                clientHost: result.clientHost
+                                            };
+
+                                            UpdateQueue.push(obj);
+                                            done();
+                                        }
+                                        //UpdateQueue.push(updateObj);
+                                        // done();
+                                    }
+                                    if(result.data[1] == 7){
+
+                                    }
+                                });
+                                break;
+                            }
+                        }
+                    }*/
+                    done();
+                }
+
     });
-    done();
+done();
 });
 
 //var

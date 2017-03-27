@@ -59,7 +59,7 @@ exports.updateDB = function (record,cb) {
                     return callback(new Error("Sorry! User with that RFID does not exist."), null);
                 }
                 userDetails = result;
-                var vehicleDetails = {
+/*                var vehicleDetails = {
                     vehicleid: vehicleData._id,
                     vehicleUid: vehicleData.vehicleUid
 
@@ -73,7 +73,7 @@ exports.updateDB = function (record,cb) {
                     }
                     console.log('User Updated');
                     // userUpdatedDetails = result;
-                });
+                });*/
 
                 return callback(null, result);
             });
