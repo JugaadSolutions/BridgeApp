@@ -2,22 +2,23 @@
  * Created by root on 1/11/16.
  */
 var async = require('async'),
+    config = require('config'),
     moment = require('moment'),
     Vehicle = require('../models/vehicle'),
-    Member = require('../models/member'),
+    BL = require('../../bin/blacklistUser'),
     Membership = require('../models/membership'),
     Port = require('../models/port'),
     Constants = require('../core/constants'),
     CheckOut = require('../models/checkout'),
     CheckIn = require('../models/checkin'),
-    FarePlanService = require('../services/fare-plan-service'),
     EventLoggersHandler = require('../handlers/event-loggers-handler'),
     Messages = require('../core/messages'),
-    Transaction = require('../services/transaction-service'),
+
     eMemberships = require('../../bin/eMemberPlans'),
-    User = require('../models/user');
+    User = require('../models/users');
 
-
+var BlackList = [];
+BlackList = BL;
 exports.updateDB = function (record,cb) {
 
 //console.log('Update rec : '+JSON.stringify(record));
@@ -59,21 +60,21 @@ exports.updateDB = function (record,cb) {
                     return callback(new Error("Sorry! User with that RFID does not exist."), null);
                 }
                 userDetails = result;
-/*                var vehicleDetails = {
-                    vehicleid: vehicleData._id,
-                    vehicleUid: vehicleData.vehicleUid
+                /*                var vehicleDetails = {
+                 vehicleid: vehicleData._id,
+                 vehicleUid: vehicleData.vehicleUid
 
-                };
-                result.vehicleId.push(vehicleDetails);
+                 };
+                 result.vehicleId.push(vehicleDetails);
 
 
-                User.findByIdAndUpdate(result._id, result, {new: true}, function (err, result) {
-                    if (err) {
-                        return callback(err, null);
-                    }
-                    console.log('User Updated');
-                    // userUpdatedDetails = result;
-                });*/
+                 User.findByIdAndUpdate(result._id, result, {new: true}, function (err, result) {
+                 if (err) {
+                 return callback(err, null);
+                 }
+                 console.log('User Updated');
+                 // userUpdatedDetails = result;
+                 });*/
 
                 return callback(null, result);
             });
@@ -141,8 +142,11 @@ exports.updateDB = function (record,cb) {
             var transDetails = {
                 user:userDetails.UserID,
                 vehicleId:vehicleData.vehicleUid,
-                fromPort:portdetails.PortID//,
+                fromPort:portdetails.PortID,
                 //checkOutTime:Date.now
+                localEntry:true,
+                checkOutInitiatedTime:record.checkOutInitiatedTime,
+                checkOutCompletionTime:record.checkOutCompletionTime
             };
             /*Transaction.checkout(transDetails,function (err,result) {
              if(err)
@@ -185,6 +189,7 @@ exports.updateDBcheckin = function (record,cb) {
     var portUpdatedDetails;
     var transDetails;
     var transactionResultDetails;
+    var checkinDetails;
     var update=0;
     var ismember=false;
 
@@ -225,7 +230,7 @@ exports.updateDBcheckin = function (record,cb) {
                         else {
                             if (result.vehicleId.length > 0) {
                                 for (var i = 0; i < result.vehicleId.length; i++) {
-                                    if (result.vehicleId[i].vehicleid.equals(vehicleData._id)) {
+                                    if (result.vehicleId[i].vehicleUid==vehicleData.vehicleUid) {
                                         result.vehicleId.splice(i, 1);
                                     }
                                 }
@@ -324,7 +329,8 @@ exports.updateDBcheckin = function (record,cb) {
              }else {*/
             var transDetails = {
                 vehicleId: vehicleData.vehicleUid,
-                toPort: portdetails.PortID//,
+                toPort: portdetails.PortID,
+                localEntry:true
                 //checkOutTime:Date.now
             };
             //}
@@ -341,70 +347,136 @@ exports.updateDBcheckin = function (record,cb) {
                     return callback(err, null);
                 }
                 transactionResultDetails = result;
+                checkinDetails = result;
                 return callback(null, result);
             });
-        },
+        }/*,
         function (callback) {
-            if(!userDetails)
-            {
-                return callback(null,null);
-            }
-            else
-            {
-                CheckOut.findOne({
-                    'vehicleId': transactionResultDetails.vehicleId,
-                    'checkOutTime': {$lt:moment(transactionResultDetails.checkInTime)}
-                }).sort({'checkOutTime': -1}).exec(function (err, checkoutdetails) {
-                    if (err) {
-                        return console.error('Error : ' + err);
-                    }
-                    if (!checkoutdetails) {
-                        return console.error('No matching Checkout');
-                    }
-                    if(checkoutdetails) {
-                        Membership.findOne({'_id':userDetails.membershipId},function (err,membership) {
-                            if (err) {
-                                return console.error('Reconciliation Membership Error : ' + err);
-                            }
-                            for (var i = 0; i < eMemberships.length; i++) {
+            CheckOut.findOne({vehicleId:checkinDetails.vehicleId,fromPort:checkinDetails.toPort,checkOutTime:{$lt:moment(checkinDetails.checkInTime)}}).sort({checkOutTime:-1}).lean().exec(function (err,coutDetails) {
+                if(err)
+                {
+                    return callback(err,null);
+                }
+                if(!coutDetails)
+                {
+                    return callback(null,null);
+                }
+                var durationMin = moment.duration(moment(checkinDetails.checkInTime).diff(coutDetails.checkOutTime));
+                var duration = durationMin.asMinutes();
+                if(duration<1)
+                {
+                    User.findOne({UserID:coutDetails.user},function (err,result) {
+                        if(err)
+                        {
+                            return callback(err,null);
+                        }
+                        if(!result)
+                        {
+                            return callback(new Error(Messages.NO_SUCH_USER_FOUND),null);
+                        }
+                        BlackList.push(result.smartCardNumber);
+                        blacklist(result.smartCardNumber);
+                        return callback(null,result);
+                    });
+                }
+                else
+                {
+                    return callback(null,null);
+                }
+            });
+        }*/
+        /*,
+         function (callback) {
+         /!*if(!userDetails)
+         {
+         return callback(null,null);
+         }
+         else
+         {*!/
+         CheckOut.findOne({
+         'vehicleId': transactionResultDetails.vehicleId,
+         'errorStatus':0,
+         'checkOutTime': {$lt:moment(transactionResultDetails.checkInTime)}
+         }).sort({'checkOutTime': -1}).exec(function (err, checkoutdetails) {
+         if (err) {
+         return console.error('Error : ' + err);
+         }
+         if (!checkoutdetails) {
+         return console.error('No matching Checkout');
+         }
+         if(checkoutdetails) {
+         User.findOne({UserID:checkoutdetails.user},function (err,userDet) {
+         if(err)
+         {
+         console.error("Couldn't able to find user at reconcilation");
+         }
+         if(userDet._type=='member')
+         {
+         Membership.findOne({'_id':userDet.membershipId},function (err,membership) {
+         if (err) {
+         return console.error('Reconciliation Membership Error : ' + err);
+         }
+         for (var i = 0; i < eMemberships.length; i++) {
 
 
-                                if (membership.subscriptionType == eMemberships[i].subscriptionType) {
-                                    var checkInTime = moment(transactionResultDetails.checkInTime);
-                                    var checkOutTime = moment(checkoutdetails.checkOutTime);
+         if (membership.userFees == eMemberships[i].userFees) {
+         var checkInTime = moment(transactionResultDetails.checkInTime);
+         var checkOutTime = moment(checkoutdetails.checkOutTime);
 
-                                    var durationMin = moment.duration(checkInTime.diff(checkOutTime));
-                                    var duration = durationMin.asMinutes();
-                                    var fee = 250;
-                                    for (var j = 0; j < eMemberships[i].plans.length; j++) {
+         var durationMin = moment.duration(checkInTime.diff(checkOutTime));
+         var duration = durationMin.asMinutes();
+         var fee = 250;
+         for (var j = 0; j < eMemberships[i].plans.length; j++) {
 
-                                        if (duration <= eMemberships[i].plans[j].endTime) {
-                                            fee = eMemberships[i].plans[j].fee;
-                                            var balance = Number(userDetails.creditBalance)-fee;
-                                            Member.findByIdAndUpdate(userDetails._id,{$set: {'creditBalance': balance}}, {new: true},function (err, updatedUser) {
-                                                if (err) {
-                                                    return console.error('Error ' + err);
-                                                }
-                                                console.log('Updated balance : '+updatedUser.creditBalance);
-                                                return callback(null,updatedUser);
-                                            });
-                                            break;
-                                        }
+         if (duration <= eMemberships[i].plans[j].endTime) {
+         fee = eMemberships[i].plans[j].fee;
+         var balance = Number(userDet.creditBalance)-fee;
+         User.findByIdAndUpdate(userDet._id,{$set: {'creditBalance': balance,vehicleId:[]}}, {new: true},function (err, updatedUser) {
+         if (err) {
+         return console.error('Error ' + err);
+         }
+         console.log('Updated balance : '+updatedUser.creditBalance);
+         return callback(null,updatedUser);
+         });
+         break;
+         }
 
-                                    }
+         }
 
-                                    break;
-                                }
-                            }
-                        });
-
-                    }
-                    else {
-                        return callback(null,null);
-                    }
-                });
-            }
-        }
+         break;
+         }
+         }
+         });
+         }
+         else
+         {
+         if (userDet.vehicleId.length > 0) {
+         for (var i = 0; i < userDet.vehicleId.length; i++) {
+         if (userDet.vehicleId[i].vehicleUid==vehicleData.vehicleUid) {
+         userDet.vehicleId.splice(i, 1);
+         }
+         }
+         User.findByIdAndUpdate(userDet._id,{$set: {vehicleId: userDet.vehicleId}}, {new: true},function (err, updatedUser) {
+         if (err) {
+         return console.error('Error ' + err);
+         }
+         console.log('Updated balance : '+updatedUser.creditBalance);
+         return callback(null,updatedUser);
+         });
+         }
+         else
+         {
+         return callback(null,userDet);
+         }
+         }
+         });
+         }
+         else {
+         return callback(null,null);
+         }
+         });
+         /!* }*!/
+         }*/
     ],function (err,result) {
         if(err)
         {
@@ -417,3 +489,17 @@ exports.updateDBcheckin = function (record,cb) {
         return cb(null,transactionResultDetails);
     });
 };
+
+/*
+function blacklist(rfid) {
+    var RFID = rfid;
+    setTimeout(function () {
+        for(var i=0;i<BlackList.length;i++)
+        {
+            if(BlackList[i]==RFID)
+            {
+                BlackList.splice(i,1);
+            }
+        }
+    },60000*Number(config.get('blacklistDelay')));
+}*/

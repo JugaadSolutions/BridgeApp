@@ -24,7 +24,7 @@ async.series([
         {
             var data = mPlans[i];
             var planDetails={
-                subscriptionType:data.subscriptionType,
+               // subscriptionType:data.subscriptionType,
                 validity:data.validity,
                 userFees:data.userFees,
                 plans:data.farePlan.plans

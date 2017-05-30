@@ -21,11 +21,17 @@ var schema = {
     duration:{type: Number, required: false,default:0},
     status: {type: String, required: true,default:'Open'},
     errorStatus:{type: Number, required: false,default:0},
-    errorMsg:{type: String, required: false}
+    localUpdate:{type: Number, required: false,default:0},
+    errorMsg:{type: String, required: false},
+    checkOutInitiatedTime: {type: Date, required: false},
+    checkOutCompletionTime: {type: Date, required: false},
+    peerGroup:{type:[],required:false,default:[]},
+    localEntry:{type:Boolean,required:false,default:false}
 };
 
 var model = new Schema(schema);
 
+model.index({ user: 1, vehicleId: 1, fromPort:1,checkOutTime:1}, { unique: true });
 // Plugins
 model.plugin(abstract);
 

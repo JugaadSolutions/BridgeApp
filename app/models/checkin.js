@@ -20,12 +20,17 @@ var schema = {
     status: {type: String, required: true, default: 'Open'},
     duration:{type: Number, required: false,default:0},
     errorStatus:{type: Number, required: false,default:0},
-    errorMsg:{type: String, required: false}
-
+    errorMsg:{type: String, required: false},
+    reconciled:{type:Number,required:false},
+    localUpdate:{type: Number, required: false,default:0},
+    peerGroup:{type:[],required:false,default:[]},
+    peerUpdate:{type:Boolean,required:false},
+    localEntry:{type:Boolean,required:false,default:false}
 };
 
 var model = new Schema(schema);
 
+model.index({ vehicleId: 1, toPort:1,checkInTime:1}, { unique: true });
 // Plugins
 model.plugin(abstract);
 

@@ -1,13 +1,11 @@
-require('./index');
-var mongoose = require('mongoose');
-    //bcrypt = require('bcryptjs');
-//var extend = require('mongoose-schema-extend');
-var Schema = mongoose.Schema;
-var abstract = require('./abstract'),
-    Constants = require('../core/constants');
-    //Messages = require('../core/messages'),
-    //ValidationHandler = require('../handlers/validation-handler');
-var autoIncrement = require('mongoose-auto-increment');
+/**
+ * Created by root on 22/4/17.
+ */
+var mongoose = require('mongoose'),
+    abstract = require('./../models/abstract'),
+    Constants = require('../core/constants'),
+    Schema = mongoose.Schema;
+
 var vehicleIds={
     vehicleid:{type:Schema.ObjectId,required:false,ref:'vehicle'},
     vehicleUid:{type:Number,required:false}
@@ -15,21 +13,22 @@ var vehicleIds={
 
 const portStats = Constants.AvailabilityStatus;
 
-var PortSchema = mongoose.Schema({
+var schema = {
     PortID : Number,
-    portCapacity:{type:Number,required:true,default:1},
-    portStatus:{type:portStats,required:true,default:Constants.AvailabilityStatus.EMPTY},
+    _type:{type:String,required:false},
+    StationId:{type:Schema.ObjectId, required:false},
+    FPGA:{type:Number,required:false},
+    ePortNumber:{type:Number,required:false},
+    DockingStationName:{type:String,required:false},
     vehicleId:{type:[vehicleIds], required:false,default:[]},
-    Name:{type:String,required:false}
+    portCapacity:{type:Number,required:false,default:1},
+    portStatus:{type:portStats,required:true,default:Constants.AvailabilityStatus.EMPTY},
+    unsyncedIp:{type:[String],required:false,default:[]},
+    syncedIp:{type:[String],required:false,default:[]},
+    lastSyncedAt:{type:Date,required:false,default:'2017-01-01T00:00:00.000Z'}
+};
 
-}, { collection : 'ports', discriminatorKey : '_type' });
-
-
-var Port = mongoose.model('port', PortSchema);
-
-PortSchema.plugin(abstract);
-
-PortSchema.plugin(autoIncrement.plugin,{model:Port,field:'PortID',startAt: 1, incrementBy: 1});
-
-
-module.exports = Port;
+var model = new Schema(schema);
+model.plugin(abstract);
+var Ports = mongoose.model('port', model, 'ports');
+module.exports = Ports;

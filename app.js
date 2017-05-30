@@ -10,9 +10,7 @@ var express = require('express'),
     config = require('config');
 
 // Application Level Dependencies
-var SecurityHandler = require('./app/handlers/security-handler'),
-    ErrorHandler = require('./app/handlers/error-handler'),
-    EncryptionService = require('./app/services/encryption-service');
+var  ErrorHandler = require('./app/handlers/error-handler');
 
 /*var routes = require('./routes/index');
 var users = require('./routes/users');*/
@@ -38,22 +36,12 @@ app.get('/', function (req, res, next) {
 });
 
 //Middleware to decrypt the request object
-app.use(function (req, res, next) {
-
-  if (!req.body.encryptedData) {
-    return next();
-  }
-
-  req.body = EncryptionService.decrypt(req.body.encryptedData);
-  next();
-
-});
 
 /*app.use('/', routes);
 app.use('/users', users);*/
 
 // Middleware to read the request object to fetch user information
-app.use(SecurityHandler.fetchUserInfoFromRequestObject());
+
 
 // Middleware to handle application level logging. It basically logs all requests and responses
 app.use(expressWinston.logger({

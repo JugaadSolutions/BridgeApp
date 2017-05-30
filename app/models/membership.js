@@ -1,60 +1,24 @@
 /**
- * Created by kiranniranjan on 5/11/16.
+ * Created by root on 22/4/17.
  */
-
-// Third Party Dependencies
 var mongoose = require('mongoose'),
-    uuid = require('node-uuid'),
-    _ = require('underscore');
+    abstract = require('./../models/abstract'),
+    Schema = mongoose.Schema;
 
-// Application Level Dependencies
-var abstract = require('./abstract'),
-    Constants = require('../core/constants');
-
-// Mongoose Schema
-var Schema = mongoose.Schema;
-
-const MembershipStatus = Constants.MembershipStatus;
-
-// Model
 var schema = {
-
-    //membershipId: {type: String, required: false, unique: true, default: uuid.v4()},
-
-    subscriptionType: {type: String, required: true},
-    validity: {type: Number, required: true},
-
-    userFees: {type: Number, required: true},
-    securityDeposit: {type: Number, required: true},
-    smartCardFees: {type: Number, required: true},
-    processingFees: {type: Number, required: true},
-
-    farePlan: {type: Schema.ObjectId, required: true, ref: "FarePlan"},
-
-    status: {type: MembershipStatus, required: true, default: MembershipStatus.ACTIVE}
+    membershipId:{type: Number, required: false},
+    userFees:{type:Number,required:false},
+    securityDeposit:{type:Number,required:false},
+    processingFees:{type:Number,required:false},
+    smartCardFees:{type:Number,required:false},
+    status:{type:Number,required:false},
+    farePlan:{type:Schema.ObjectId,required:false,ref:'fareplan'},
+    validity:{type: Number, required: false},
+    unsyncedIp:{type:[String],required:false,default:[]},
+    syncedIp:{type:[String],required:false,default:[]},
+    lastSyncedAt:{type:Date,required:false,default:'2017-01-01T00:00:00.000Z'}
 };
-
 var model = new Schema(schema);
-
-// Plugins
 model.plugin(abstract);
-
-// Hooks
-/*model.pre('save', function (next) {
-
-    var doc = this;
-
-    if (doc.isNew) {
-
-        doc.membershipId = uuid.v4();
-
-    }
-
-    next();
-
-});*/
-
-// Mongoose Model
-var Membership = mongoose.model('Membership', model, 'membership');
-
+var Membership = mongoose.model('membership', model, 'membership');
 module.exports = Membership;

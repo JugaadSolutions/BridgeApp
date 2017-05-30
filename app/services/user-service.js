@@ -7,16 +7,18 @@ var async = require('async'),
 
 var Messages = require('../core/messages'),
     _ = require('underscore'),
-    jwt = require('jsonwebtoken'),
+    /* jwt = require('jsonwebtoken'),*/
     config = require('config'),
     Constants = require('../core/constants'),
-    //moment = require('moment'),
     Vehicle=require('../models/vehicle'),
+    CheckOut = require('../models/checkout'),
     EventLoggersHandler = require('../handlers/event-loggers-handler'),
-    User = require('../models/user');
-var DockingStation = require('../models/dock-station'),
-    UtilsHandler = require('../handlers/utils-handler'),
-    DockingPort = require('../models/dock-port');
+    User = require('../models/users');
+var UtilsHandler = require('../handlers/utils-handler');
+var BL = require('../../bin/blacklistUser');
+var BlackList = [];
+BlackList = BL;
+
 
 
 /* ************** For Bridge ************************** */
@@ -33,7 +35,15 @@ exports.userVerify = function (id,callback) {
         }
         if(result._type=='member')
         {
-            if (!result.status == Constants.MemberStatus.REGISTERED) {
+            var u = new Date();
+            var t = u.getHours();
+
+            if(t<config.get('time.from') ||t>=config.get('time.to'))
+            {
+                EventLoggersHandler.logger.warn(Messages.NON_OPERATIONAL_HOURS);
+                return callback(new Error("Non operational Hours"),1,null);
+            }
+            if (result.status != Constants.MemberStatus.REGISTERED) {
                 EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
                 return callback(new Error("Sorry! It looks like your validity has expired"),1,null);
             }
@@ -63,190 +73,215 @@ exports.userVerify = function (id,callback) {
             //keyUser = userDetails.smartCardKey;
             //console.log(keyUser);
             //callback(null,null);
+            return callback(null,0,result);
+        }
+        else if(result._type=='redistribution-employee' || result._type=='maintenancecentre-employee')
+        {
+            if (result.status != 1) {
+                EventLoggersHandler.logger.warn('Blocked or inactive employee');
+                return callback(new Error("Blocked or inactive employee"),1,null);
+            }
+            return callback(null,0,result);
+        }
+        else
+        {
+            if (result.status != 1) {
+                EventLoggersHandler.logger.warn('Blocked or inactive employee');
+                return callback(new Error("Blocked or inactive employee"),1,null);
+            }
+
+            if(result.vehicleId.length>0)
+            {
+                EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
+                return callback(new Error("Sorry! It looks like your previous transaction is not completed"),1,null);
+            }
+
+            return callback(null,0,result);
         }
 
-        return callback(null,0,result);
+
     });
 };
 
 exports.checkOutAuthenticationService=function (record,keyUser,cb) {
     var command;
-       // keyUser;
+    // keyUser;
     var Ds=0;
     var Dp=0;
     var userDetails=0;
-async.series([
-    /*function (callback) {
-        command = record.data[21];
-        if (command != "1") {
-            EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
-            return callback(new Error("Sorry! It looks like you tapped on an open port", null));
-        }
-        var userIds = record.data.slice(5, 21);
-        User.findOne({'smartCardNumber':userIds}).lean().exec(function (err,result) {
-            if(err)
-            {
-                return callback(err,null);
-            }
-            if (!result) {
-                EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
-                return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
-            }
-            userDetails=result;
-            return callback(null,result);
-        });
-    },*/
-/*    function (callback) {
-    //console.log(record.data.length);
-        command = record.data[21];
-        if (command != "1") {
-            EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
-            return callback(new Error("Sorry! It looks like you tapped on an open port", null));
-        }
+    async.series([
+        /*function (callback) {
+         command = record.data[21];
+         if (command != "1") {
+         EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+         return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+         }
+         var userIds = record.data.slice(5, 21);
+         User.findOne({'smartCardNumber':userIds}).lean().exec(function (err,result) {
+         if(err)
+         {
+         return callback(err,null);
+         }
+         if (!result) {
+         EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+         return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
+         }
+         userDetails=result;
+         return callback(null,result);
+         });
+         },*/
+        /*    function (callback) {
+         //console.log(record.data.length);
+         command = record.data[21];
+         if (command != "1") {
+         EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+         return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+         }
 
-        if (record.data.length != 43) {
-            EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
-            return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
-        }
+         if (record.data.length != 43) {
+         EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
+         return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
+         }
 
-        DockingStation.findOne({'ipAddress': config.get('ipAddress')},function (err,result) {
-            if(err)
-            {
-                EventLoggersHandler.logger.error(err);
-                return callback(err, null);
-            }
-            if (!result) {
-                EventLoggersHandler.logger.error(Messages.NO_DOCKING_STATION_FOUND_WITH_THE_IP_ADDRESS + config.get('ipAddress'));
-                return callback(new Error(Messages.NO_DOCKING_STATION_FOUND_WITH_THE_IP_ADDRESS), null);
-            }
-            if (result.operationStatus != Constants.OperationStatus.OPERATIONAL) {
-                EventLoggersHandler.logger.error(Messages.DOCKING_STATION_IS_UNDER_MAINTENANCE, result.name);
-                return callback(new Error(Messages.DOCKING_STATION_IS_UNDER_MAINTENANCE), null);
-            }
-            Ds=result;
-            return callback(null,null);
-        });
+         DockingStation.findOne({'ipAddress': config.get('ipAddress')},function (err,result) {
+         if(err)
+         {
+         EventLoggersHandler.logger.error(err);
+         return callback(err, null);
+         }
+         if (!result) {
+         EventLoggersHandler.logger.error(Messages.NO_DOCKING_STATION_FOUND_WITH_THE_IP_ADDRESS + config.get('ipAddress'));
+         return callback(new Error(Messages.NO_DOCKING_STATION_FOUND_WITH_THE_IP_ADDRESS), null);
+         }
+         if (result.operationStatus != Constants.OperationStatus.OPERATIONAL) {
+         EventLoggersHandler.logger.error(Messages.DOCKING_STATION_IS_UNDER_MAINTENANCE, result.name);
+         return callback(new Error(Messages.DOCKING_STATION_IS_UNDER_MAINTENANCE), null);
+         }
+         Ds=result;
+         return callback(null,null);
+         });
 
-    },
-    function (callback) {
-        if(Ds!=0) {
-            var FPGA = record.data.slice(2, 4);
-            var eportNumber = record.data.slice(4, 5);
+         },
+         function (callback) {
+         if(Ds!=0) {
+         var FPGA = record.data.slice(2, 4);
+         var eportNumber = record.data.slice(4, 5);
 
-            DockingPort.findOne({'FPGA': FPGA, 'ePortNumber': eportNumber}, function (err, result) {
-                if (err) {
-                    EventLoggersHandler.logger.error(err);
-                    return callback(err, null);
-                }
-                if (!result) {
-                    EventLoggersHandler.logger.error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + FPGA);
-                    EventLoggersHandler.logger.error(Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER + eportNumber);
-                    return callback(new Error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + " and " + Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER), null);
-                }
-                if (record.portStatus != Constants.AvailabilityStatus.FULL) {
-                    EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE+' OR EMPTY', eportNumber);
-                    return callback(new Error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE+' OR EMPTY'), null);
-                }
-                Dp=result;
-                return callback(null,result);
-            });
-        }
-        else
-        {
-            return callback(null,null);
-        }
-    },*//*
-    function (callback) {
-        if(Dp!=0)
-        {
+         DockingPort.findOne({'FPGA': FPGA, 'ePortNumber': eportNumber}, function (err, result) {
+         if (err) {
+         EventLoggersHandler.logger.error(err);
+         return callback(err, null);
+         }
+         if (!result) {
+         EventLoggersHandler.logger.error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + FPGA);
+         EventLoggersHandler.logger.error(Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER + eportNumber);
+         return callback(new Error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + " and " + Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER), null);
+         }
+         if (record.portStatus != Constants.AvailabilityStatus.FULL) {
+         EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE+' OR EMPTY', eportNumber);
+         return callback(new Error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE+' OR EMPTY'), null);
+         }
+         Dp=result;
+         return callback(null,result);
+         });
+         }
+         else
+         {
+         return callback(null,null);
+         }
+         },*//*
+         function (callback) {
+         if(Dp!=0)
+         {
+         command = record.data[21];
+         if (command != "1") {
+         EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+         return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+         }
+         var userIds = record.data.slice(5, 21);
+         User.findOne({'smartCardNumber':userIds}).lean().exec(function (err,result) {
+         if(err)
+         {
+         return callback(err,null);
+         }
+         if (!result) {
+         EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+         return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
+         }
+         userDetails=result;
+         return callback(null,result);
+         });
+         }
+         else
+         {
+         return callback(null,null);
+         }
+         }*//*,
+         function (callback) {
+         if(userDetails!=0)
+         {
+         if(userDetails._type=='member')
+         {
+         if (!userDetails.status == Constants.MemberStatus.REGISTERED) {
+         EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+         return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
+         }
+
+         if (userDetails.creditBalance < 5) {
+         EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+
+         return callback(new Error("Sorry! You don't have sufficient balance"));
+         }
+         //console.log(userDetails.smartCardKey);
+         keyUser = userDetails.smartCardKey;
+         //console.log(keyUser);
+         callback(null,null);
+         }
+         else
+         {
+         keyUser = userDetails.smartCardKey;
+         callback(null,null);
+         }
+
+         }
+         else
+         {
+         return callback(null,null);
+         }
+
+         },*/
+        function (callback) {
+
             command = record.data[21];
             if (command != "1") {
                 EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
                 return callback(new Error("Sorry! It looks like you tapped on an open port", null));
             }
-            var userIds = record.data.slice(5, 21);
-            User.findOne({'smartCardNumber':userIds}).lean().exec(function (err,result) {
-                if(err)
-                {
-                    return callback(err,null);
-                }
-                if (!result) {
-                    EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
-                    return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
-                }
-               userDetails=result;
-                return callback(null,result);
-            });
-        }
-        else
-        {
-            return callback(null,null);
-        }
-    }*//*,
-    function (callback) {
-        if(userDetails!=0)
-        {
-            if(userDetails._type=='member')
-            {
-                if (!userDetails.status == Constants.MemberStatus.REGISTERED) {
-                    EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
-                    return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
-                }
 
-                if (userDetails.creditBalance < 5) {
-                    EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
-
-                    return callback(new Error("Sorry! You don't have sufficient balance"));
-                }
-                //console.log(userDetails.smartCardKey);
-                keyUser = userDetails.smartCardKey;
-                //console.log(keyUser);
-                callback(null,null);
-            }
-            else
-            {
-                keyUser = userDetails.smartCardKey;
-                callback(null,null);
+            if (record.data.length != 43) {
+                EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
+                return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
             }
 
+            var stepNumber = 2;
+            var indicatorId = "2";
+            var command = "9";
+            keyUser="FFFFFFFFFFFF0000";
+            record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 1, 2, stepNumber);
+            record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 24, 40, keyUser);
+            record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 22, 23, indicatorId);
+            record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 21, 22, command);
+
+            return callback(null, null);
         }
-        else
+
+    ],function (err,result) {
+        if(err)
         {
-            return callback(null,null);
+            return cb(err,null);
         }
-
-    },*/
-    function (callback) {
-        command = record.data[21];
-        if (command != "1") {
-            EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
-            return callback(new Error("Sorry! It looks like you tapped on an open port", null));
-        }
-
-        if (record.data.length != 43) {
-            EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_USER_AUTHENTICATION_EXPECTING_42_BYTES);
-            return callback(new Error("This is an invalid Data Packet for User Authentication. Expecting 42 bytes.", null));
-        }
-
-        var stepNumber = 2;
-        var indicatorId = "2";
-        var command = "9";
-        keyUser="FFFFFFFFFFFF0000";
-        record.data = UtilsHandler.replaceStringWithIndexPosition(record.data, 1, 2, stepNumber);
-        record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 24, 40, keyUser);
-        record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 22, 23, indicatorId);
-        record.data= UtilsHandler.replaceStringWithIndexPosition(record.data, 21, 22, command);
-
-        return callback(null, null);
-    }
-
-],function (err,result) {
-    if(err)
-    {
-        return cb(err,null);
-    }
-    return cb(null,record);
-});
+        return cb(null,record);
+    });
 
 };
 
@@ -270,99 +305,159 @@ exports.checkOutCommunicationService=function (record,cb) {
                 return callback(new Error("Sorry! It looks like you tapped on an open port", null));
             }
             /*var fpga = record.data.slice(2, 4);
-            var ePortNumber = record.data[4];
-            DockingPort.findOne({'FPGA':fpga,'ePortNumber':ePortNumber}).lean().exec(function (err,result) {
-                if(err)
-                {
-                    return callback(err,null);
-                }
-                if(!result)
-                {
-                    EventLoggersHandler.logger.error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + record.FPGA);
-                    EventLoggersHandler.logger.error(Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER +record.ePortNumber);
-                    return callback(new Error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + " and " + Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER), null);
-                }
-                if(result.portStatus==Constants.AvailabilityStatus.EMPTY && result.vehicleId.length==0)
-                {
-                    EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_EMPTY);
-                }
-            });*/
+             var ePortNumber = record.data[4];
+             DockingPort.findOne({'FPGA':fpga,'ePortNumber':ePortNumber}).lean().exec(function (err,result) {
+             if(err)
+             {
+             return callback(err,null);
+             }
+             if(!result)
+             {
+             EventLoggersHandler.logger.error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + record.FPGA);
+             EventLoggersHandler.logger.error(Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER +record.ePortNumber);
+             return callback(new Error(Messages.NO_DOCKING_UNIT_FOUND_WITH_THE_UNIT_NUMBER + " and " + Messages.NO_DOCKING_PORT_FOUND_WITH_THE_PORT_NUMBER), null);
+             }
+             if(result.portStatus==Constants.AvailabilityStatus.EMPTY && result.vehicleId.length==0)
+             {
+             EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_EMPTY);
+             }
+             });*/
+
             if(record.portStatus==Constants.AvailabilityStatus.EMPTY)
             {
                 EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_EMPTY);
                 return callback(new Error(Messages.DOCKING_PORT_IS_EMPTY), null);
             }
+            if(record.portStatus==Constants.AvailabilityStatus.ERROR)
+            {
+                EventLoggersHandler.logger.error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE);
+                var error = new Error(Messages.DOCKING_PORT_IS_UNDER_MAINTENANCE);
+                error.name='PortError';
+                error.unit=record.FPGA;
+                error.port=record.ePortNumber;
+                error.clientHost = record.clientHost;
+                error.clientPort = record.clientPort;
+                return callback(error,null);
+            }
             return callback(null,record);
         },
-            function (record,callback) {
-/*
-                if (record.data.length != 171) {
-                    EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKOUT_TRANSACTION_EXPECTING_171_BYTES);
-                    return callback(new Error("Sorry! This is an invalid Data Packet for Checkout Transaction. Expecting 171 bytes.", null));
+        function (record,callback) {
+            /*
+             if (record.data.length != 171) {
+             EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKOUT_TRANSACTION_EXPECTING_171_BYTES);
+             return callback(new Error("Sorry! This is an invalid Data Packet for Checkout Transaction. Expecting 171 bytes.", null));
+             }
+             command = record.data[37];
+             if (command != "1") {
+             EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
+             return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+             }
+             */
+            userId = record.data.slice(5, 21);
+            User.findOne({'smartCardNumber':userId}).lean().exec(function (err,result) {
+                if(err)
+                {
+                    return callback(err,null);
                 }
-                command = record.data[37];
-                if (command != "1") {
-                    EventLoggersHandler.logger.warn(Messages.SORRY_IT_LOOKS_LIKE_YOU_TAPPED_ON_AN_OPEN_PORT);
-                    return callback(new Error("Sorry! It looks like you tapped on an open port", null));
+                if (!result) {
+                    EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
+                    return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
                 }
-*/
-                userId = record.data.slice(5, 21);
-                User.findOne({'smartCardNumber':userId}).lean().exec(function (err,result) {
-                    if(err)
+                if(result._type=='member')
+                {
+                    for(var b=0;b<BlackList.length;b++) {
+                        if (BlackList[b] == record.data.slice(5, 21)) {
+                            EventLoggersHandler.logger.warn('Black listed user');
+                            var error = new Error("Black listed user");
+                            error.name='Trans';
+                            error.unit=record.FPGA;
+                            error.port=record.ePortNumber;
+                            error.clientHost = record.clientHost;
+                            error.clientPort = record.clientPort;
+                            return callback(error,null);
+                        }
+                    }
+
+                    var u = new Date();
+                    var t = u.getHours();
+
+                    if(t<config.get('time.from') ||t>=config.get('time.to'))
                     {
-                        return callback(err,null);
+                        EventLoggersHandler.logger.warn(Messages.NON_OPERATIONAL_HOURS);
+                        return callback(new Error("Non operational Hours"),1,null);
                     }
-                    if (!result) {
-                        EventLoggersHandler.logger.error(Messages.MEMBER_WITH_THAT_SMART_CARD_RFID_DOES_NOT_EXIST);
-                        return callback(new Error("Sorry! Member with that Smart Card RFID does not exist."), null);
+                    /* var memberBalance = result.creditBalance;
+                     var octalString = exports.generateControlNumber(memberBalance, 4);*/
+                    balance = zeroPad(result.creditBalance,4);
+                    //console.log('Balance : '+balance);
+                    if (!result.status == Constants.MemberStatus.REGISTERED) {
+                        EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                        return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
                     }
-                    if(result._type=='member')
+
+                    if(result.vehicleId.length>0)
                     {
-                        /* var memberBalance = result.creditBalance;
-                         var octalString = exports.generateControlNumber(memberBalance, 4);*/
-                        balance = zeroPad(result.creditBalance,4);
-                        //console.log('Balance : '+balance);
-                        if (!result.status == Constants.MemberStatus.REGISTERED) {
-                            EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
-                            return callback(new Error("Sorry! It looks like your validity has expired or you don't have sufficient balance"));
-                        }
-
-                        if(result.vehicleId.length>0)
-                         {
-                         EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
-                             var error = new Error("Sorry! It looks like your previous transaction is not completed");
-                             error.name='Trans';
-                             error.unit=record.FPGA;
-                             error.port=record.ePortNumber;
-                             error.clientHost = record.clientHost;
-                             error.clientPort = record.clientPort;
-                         return callback(error,null);
-                         }
-
-                        if (Number(result.creditBalance) <= 5) {
-                            EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
-                            return callback(new Error("Sorry! You don't have sufficient balance"));
-                        }
-                        //console.log(userDetails.smartCardKey);
-                        //keyUser = userDetails.smartCardKey;
-                        //console.log(keyUser);
-                        var validity = moment(result.validity);
-                        var current = moment();
-                        var days = moment.duration(validity.diff(current));
-                        var duration = days.asDays();
-                        if(duration<0)
-                        {
-                            EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
-                            return callback(new Error("Sorry! It looks like your validity has expired"),null);
-                        }
-                        userDetails = result;
-                        record.UserID=result.UserID;
-                        record.cardRFID=result.smartCardNumber;
+                        EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
+                        var error = new Error("Sorry! It looks like your previous transaction is not completed");
+                        error.name='Trans';
+                        error.unit=record.FPGA;
+                        error.port=record.ePortNumber;
+                        error.clientHost = record.clientHost;
+                        error.clientPort = record.clientPort;
+                        return callback(error,null);
                     }
-                    return callback(null, result);
-                });
 
-            }
+                    if (Number(result.creditBalance) <= 5) {
+                        EventLoggersHandler.logger.warn(Messages.YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                        return callback(new Error("Sorry! You don't have sufficient balance"));
+                    }
+                    //console.log(userDetails.smartCardKey);
+                    //keyUser = userDetails.smartCardKey;
+                    //console.log(keyUser);
+                    var validity = moment(result.validity);
+                    var current = moment();
+                    var days = moment.duration(validity.diff(current));
+                    var duration = days.asDays();
+                    if(duration<0)
+                    {
+                        EventLoggersHandler.logger.warn(Messages.IT_LOOKS_LIKE_YOUR_VALIDITY_HAS_EXPIRED_OR_YOU_DONT_HAVE_SUFFICIENT_BALANCE);
+                        return callback(new Error("Sorry! It looks like your validity has expired"),null);
+                    }
+                    userDetails = result;
+                    record.UserID=result.UserID;
+                    record.cardRFID=result.smartCardNumber;
+                    return callback(null,result);
+                }
+                else if(result._type=='redistribution-employee' || result._type=='maintenancecentre-employee')
+                {
+                    if (result.status != 1) {
+                        EventLoggersHandler.logger.warn('Blocked or inactive employee');
+                        return callback(new Error("Blocked or inactive employee"),null);
+                    }
+                    userDetails = result;
+                    record.UserID=result.UserID;
+                    record.cardRFID=result.smartCardNumber;
+                    return callback(null,result);
+                }
+                else
+                {
+                    if (result.status != 1) {
+                        EventLoggersHandler.logger.warn('Blocked or inactive employee');
+                        return callback(new Error("Blocked or inactive employee"),null);
+                    }
+                    if(result.vehicleId.length>0)
+                    {
+                        EventLoggersHandler.logger.warn(Messages.YOUR_PREVIOUS_TRANSACTION_IS_NOT_COMPLETE);
+                        return callback(new Error("Sorry! It looks like your previous transaction is not completed"),1,null);
+                    }
+                    userDetails = result;
+                    record.UserID=result.UserID;
+                    record.cardRFID=result.smartCardNumber;
+                    return callback(null,result);
+                }
+            });
+
+        }
         ,
         function (result,callback) {
             var bicycleId = record.data.slice(21, 37);
@@ -429,10 +524,9 @@ exports.checkInCommunicationService = function (eport, cb) {
     var vehicleDetails;
     async.series([
 
-            // Step 1 Validation
             function (callback) {
 
-                if(eport.portStatus==Constants.AvailabilityStatus.EMPTY) {
+                if(eport.portStatus==Constants.AvailabilityStatus.EMPTY ||eport.portStatus==Constants.AvailabilityStatus.ERROR) {
 
                     if (eport.data.length != 26) {
                         EventLoggersHandler.logger.error(Messages.THIS_IS_AN_INVALID_DATA_PACKET_FOR_CHECKIN_TRANSACTION_EXPECTING_26_BYTES);
@@ -458,7 +552,11 @@ exports.checkInCommunicationService = function (eport, cb) {
                         eport.vehicleRFID = result.vehicleRFID;
                         eport.vehicleUid = result.vehicleUid;
                         eport.vehicleid = result._id;
-                        eport.portStatus = Constants.AvailabilityStatus.FULL;
+                        if(eport.portStatus != Constants.AvailabilityStatus.ERROR)
+                        {
+                            eport.portStatus = Constants.AvailabilityStatus.FULL;
+                        }
+
                         vehicleDetails = result;
                         return callback(null, result);
 
@@ -466,53 +564,58 @@ exports.checkInCommunicationService = function (eport, cb) {
                 }
                 else
                 {
+                    return callback(new Error('Port is in tranisition state'),null);
+                }
+
+            },
+            function (callback) {
+                if(eport.portStatus==Constants.AvailabilityStatus.FULL ||eport.portStatus==Constants.AvailabilityStatus.ERROR) {
+                    CheckOut.findOne({vehicleId:eport.vehicleUid,localEntry:true,checkOutTime:{$lt:moment()}}).sort({checkOutTime:-1}).lean().exec(function (err,coutDetails) {
+                        if (err) {
+                            return callback(null,null);
+                        }
+                        if (coutDetails) {
+                            var durationMin = moment.duration(moment().diff(coutDetails.checkOutTime));
+                            var duration = durationMin.asMinutes();
+                            if (duration < 1) {
+                                User.findOne({UserID: coutDetails.user}).exec(function (err, result) {
+                                    if (err) {
+                                        return callback(null,null);
+                                    }
+                                    if (!result) {
+                                        return callback(null,null);
+                                    }
+                                    else {
+                                        if(result._type=='member')
+                                        {
+                                            BlackList.push(result.smartCardNumber);
+                                            blacklist(result.smartCardNumber);
+                                        }
+                                        return callback(null,null);
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                return callback(null,null);
+                            }
+                        }
+                        else
+                        {
+                            return callback(null,null);
+                        }
+                    });
+                }
+                else
+                {
                     return callback(null,null);
                 }
-
-            }/*,
-        function (callback) {
-            //var indicatorId = 3;
-            User.findOne({'_id':vehicleDetails.currentAssociationId}).lean().exec(function (err,result) {
-                if(err)
-                {
-                    return callback(err,null);
-                }
-                eport.UserID=result.UserID;
-                eport.cardRFID=result.smartCardNumber;
-                return callback(null,result);
-            });
-        }*/
-/*          ,
-
-            // Step 2 update the packet
-            function (callback) {
-
-               /!* var stepNumber = 8;
-                var indicatorId = "3";
-                var command = "8";
-                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 1, 2, stepNumber);
-                eport.data= UtilsHandler.replaceStringWithIndexPosition(eport.data, 23, 24, indicatorId);
-                eport.data= UtilsHandler.replaceStringWithIndexPosition(eport.data, 21, 22, command);
-*!/
-                //eport.data='/A051000000000000~';
-                var stepNumber = 'A';
-                var indicatorId = 3;
-                var command = "0";
-                var data = "00000000";
-                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 5, 21, data);
-                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 1, 2, stepNumber);
-                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 5, 6, command);
-                eport.data = UtilsHandler.replaceStringWithIndexPosition(eport.data, 6, 7, indicatorId);
-
-                return callback(null, null);
-
-            }*/
-
+            }
         ],
         function (err, results) {
 
             if (err) {
-                return cb(err, eport)
+                return cb(err, null)
             }
 
             return cb(null, eport);
@@ -577,75 +680,20 @@ function zeroPad(num, numZeros) {
     return zeroString+n;
 }
 
+
+function blacklist(rfid) {
+    var RFID = rfid;
+    setTimeout(function () {
+        for(var i=0;i<BlackList.length;i++)
+        {
+            if(BlackList[i]==RFID)
+            {
+                BlackList.splice(i,1);
+            }
+        }
+    },60000*Number(config.get('blacklistDelay')));
+}
+
+
 /* ************** For Bridge ************************** */
 
-
-exports.loginUser = function (loginData, callback) {
-
-    var username = loginData.username;
-    var password = loginData.password;
-
-    if (!username || !password) {
-        var invalidInputError = new Error(Messages.INVALID_USERNAME_OR_PASSWORD);
-        invalidInputError.name = "UserError";
-        return callback(invalidInputError, null);
-    }
-/*    if(username!='admin@mytrintrin.com') {
-        Member.findOne({emailAddress: username}, function (err, data) {
-            if (err) {
-                return memId = '';
-            }
-            memId = data._id;
-        });
-    }*/
-    User.findOne({$or: [{phoneNumber: username}, {email: username}]}, function (err, record) {
-
-        var Id = record._id;
-        var Role = record._type;
-        if (err) {
-            return callback(err, null);
-        }
-
-        if (!record) {
-            var noUserError = new Error(Messages.INVALID_USERNAME_OR_PASSWORD);
-            noUserError.name = "UserError";
-            return callback(noUserError, null);
-        }
-
-        if (!record.emailVerified) {
-            return callback(new Error('Your Email Is Not Yet Verified'/*Messages.YOUR_EMAIL_IS_NOT_YET_VERIFIED_PLEASE_VERIFY_BEFORE_LOGGING_IN*/), null);
-        }
-
-        record.comparePassword(password, function (err, isMatch) {
-
-            if (err || !isMatch) {
-                var incorrectCredentialsError = new Error(Messages.INVALID_USERNAME_OR_PASSWORD);
-                incorrectCredentialsError.name = "UserError";
-                return callback(incorrectCredentialsError, null);
-            }
-
-            record.userId = record._id;
-            record = _.pick(record, 'email', '_type', 'phoneNumber', 'userID', 'createdAt');
-
-
-
-            var TOKEN_EXPIRATION_HOURS = config.get("security.tokenExpiryHours");
-            var TOKEN_EXPIRATION_MINUTES = 60 * TOKEN_EXPIRATION_HOURS;
-            var TOKEN_EXPIRATION_TIME = 60 * TOKEN_EXPIRATION_MINUTES;
-
-            var token = jwt.sign(record, config.get('security.secret'), {expiresIn: TOKEN_EXPIRATION_TIME});
-
-            var tokenData = {
-                token: token,
-                expiresIn: TOKEN_EXPIRATION_TIME,
-                id:Id,
-                role:Role
-            };
-
-            return callback(null, tokenData);
-
-        });
-
-    });
-
-};

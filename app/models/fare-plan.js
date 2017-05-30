@@ -1,61 +1,29 @@
 /**
- * Created by kiranniranjan on 5/25/16.
+ * Created by root on 22/4/17.
  */
-
-// Third Party Dependencies
 var mongoose = require('mongoose'),
-    uuid = require('node-uuid'),
-    _ = require('underscore');
-
-// Application Level Dependencies
-var abstract = require('./abstract'),
-    Constants = require('../core/constants');
-
-// Mongoose Schema
-var Schema = mongoose.Schema;
+    abstract = require('./../models/abstract'),
+    Constants = require('../core/constants'),
+    Schema = mongoose.Schema;
 
 const FarePlanStatus = Constants.FarePlanStatus;
 
-// Nested model
 var Plans = {
     startTime: {type: Number, required: true},
     endTime: {type: Number, required: true},
     fee: {type: Number, required: true}
 };
 
-// Model
 var schema = {
-
-    //farePlanId: {type: String, required: false, unique: true, default: uuid.v4()},
-
-    planName: {type: String, required: true, unique: true},
+    fareplanUid:Number,
     plans: {type: [Plans], required: true},
-
-    status: {type: FarePlanStatus, required: true, default: FarePlanStatus.ACTIVE}
-
+    status: {type: FarePlanStatus, required: true, default: FarePlanStatus.ACTIVE},
+    unsyncedIp:{type:[String],required:false,default:[]},
+    syncedIp:{type:[String],required:false,default:[]},
+    lastSyncedAt:{type:Date,required:false,default:'2017-01-01T00:00:00.000Z'}
 };
 
 var model = new Schema(schema);
-
-// Plugins
 model.plugin(abstract);
-
-// Hooks
-/*model.pre('save', function (next) {
-
-    var doc = this;
-
-    if (doc.isNew) {
-
-        doc.farePlanId = uuid.v4();
-
-    }
-
-    next();
-
-});*/
-
-// Mongoose Model
-var FarePlan = mongoose.model('FarePlan', model, 'fare-plan');
-
-module.exports = FarePlan;
+var Fareplan = mongoose.model('fareplan', model, 'fare-plan');
+module.exports = Fareplan;

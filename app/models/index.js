@@ -9,7 +9,6 @@ var host = config.get('db.host'),
     database = config.get('db.database'),
 
     dbUrl = 'mongodb://' + host + ':' + port + '/' + database;
-var autoIncrement = require('mongoose-auto-increment');
 
 if (username != '' && password !='') {
 
@@ -17,15 +16,10 @@ if (username != '' && password !='') {
         user: username,
         pass: password
     };
-
     mongoose.connect(dbUrl, options);
+}
+else {
 
-} else {
-
-  autoIncrement.initialize(mongoose.connect(dbUrl));
+    mongoose.connect(dbUrl);
 
 }
-require('./user');
-require('./admin');
-
-require('./port');

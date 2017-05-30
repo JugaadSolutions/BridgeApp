@@ -1,11 +1,19 @@
 var async = require('async'),
+    config = require('config'),
     Vehicle=require('../models/vehicle'),
     mongoose = require('mongoose'),
     Port = require('../models/port'),
+    CheckOut = require('../models/checkout'),
+    User = require('../models/users'),
     Constants = require('../core/constants'),
     LocalUpdate = require('../services/localupdate-service'),
-   // Fleet = require('../models/fleet'),
+    moment = require('moment'),
     Messages = require('../core/messages');
+
+var BL = require('../../bin/blacklistUser');
+var BlackList = [];
+BlackList = BL;
+
 
 exports.addBicycle=function (record, callback) {
 
@@ -125,9 +133,56 @@ exports.vehicleVerification = function (record,id,callback) {
                 vehicleDetails=result;
                 record.vehicleRFID=result.vehicleRFID;
                 record.vehicleUid=result.vehicleUid;
-                record.portStatus=Constants.AvailabilityStatus.FULL;
+                if(record.portStatus != Constants.AvailabilityStatus.ERROR)
+                {
+                    record.portStatus = Constants.AvailabilityStatus.FULL;
+                }
                 return callback(null,result);
             });
+        },function (callback) {
+            if(id==1) {
+                CheckOut.findOne({
+                    vehicleId: record.vehicleUid,
+                    localEntry:true,
+                    checkOutTime: {$lt: moment()}
+                }).sort({checkOutTime: -1}).lean().exec(function (err, coutDetails) {
+                    if (err) {
+                        return callback(null, null);
+                    }
+                    if (coutDetails) {
+                        var durationMin = moment.duration(moment().diff(coutDetails.checkOutTime));
+                        var duration = durationMin.asMinutes();
+                        if (duration < 1) {
+                            User.findOne({UserID: coutDetails.user}).exec(function (err, result) {
+                                if (err) {
+                                    return callback(null, null);
+                                }
+                                if (!result) {
+                                    return callback(null, null);
+                                }
+                                else {
+                                    if(result._type=='member')
+                                    {
+                                        BlackList.push(result.smartCardNumber);
+                                        blacklist(result.smartCardNumber);
+                                    }
+                                    return callback(null, null);
+                                }
+                            });
+                        }
+                        else {
+                            return callback(null, null);
+                        }
+                    }
+                    else {
+                        return callback(null, null);
+                    }
+                });
+            }
+            else
+                {
+                    return callback(null,null);
+                }
         },
         function (callback) {
             if(id==1)
@@ -169,3 +224,16 @@ exports.vehicleVerification = function (record,id,callback) {
     });
 
 };
+
+function blacklist(rfid) {
+    var RFID = rfid;
+    setTimeout(function () {
+        for(var i=0;i<BlackList.length;i++)
+        {
+            if(BlackList[i]==RFID)
+            {
+                BlackList.splice(i,1);
+            }
+        }
+    },60000*Number(config.get('blacklistDelay')));
+}

@@ -39,7 +39,9 @@ async.series([
                     lockStatus: Constants.LockStatus.NORMAL,
                     LEDIndication:0,
                     clientHost:'',
-                    clientPort:''
+                    clientPort:'',
+                    checkOutInitiatedTime:'',
+                    checkOutCompletionTime:''
                 };
                 console.log('FPGA : '+eportDetails.FPGA);
                 console.log('PortNumber : '+eportDetails.ePortNumber);
@@ -62,7 +64,9 @@ async.series([
                     lockStatus: Constants.LockStatus.NORMAL,
                     LEDIndication:0,
                     clientHost:'',
-                    clientPort:''
+                    clientPort:'',
+                    checkOutInitiatedTime:'',
+                    checkOutCompletionTime:''
                 };
             }
             eport.push(eportDetails);

@@ -87,11 +87,20 @@ exports.updatePort = function (eport,stepNo,data,keyUser,callback) {
             if(eport.data=="0000000000000000")
             {
                 console.log('FPGA : '+eport.FPGA+' port'+eport.ePortNumber+'empty');
-                eport.portStatus=Constants.AvailabilityStatus.EMPTY;
-                var u = eport.FPGA;
-                var p =eport.ePortNumber;
-                eport.data='/A0'+u+p+'100000000000~';
-                return callback(null,eport);
+                if(eport.portStatus==Constants.AvailabilityStatus.ERROR)
+                {
+                    var un = eport.FPGA;
+                    var po =eport.ePortNumber;
+                    eport.portStatus=Constants.AvailabilityStatus.ERROR;
+                    eport.data='/A0'+un+po+'A00000000000~';
+                    return callback(null,eport);
+                }else {
+                    eport.portStatus = Constants.AvailabilityStatus.EMPTY;
+                    var u = eport.FPGA;
+                    var p = eport.ePortNumber;
+                    eport.data = '/A0' + u + p + '100000000000~';
+                    return callback(null, eport);
+                }
             }
             else
             {
@@ -116,6 +125,14 @@ exports.updatePort = function (eport,stepNo,data,keyUser,callback) {
                         eport.data='/A0'+un+po+'A00000000000~';
                         return callback(null,eport);
                     }
+                }
+                else if(eport.portStatus==Constants.AvailabilityStatus.ERROR)
+                {
+                        var un = eport.FPGA;
+                        var po =eport.ePortNumber;
+                        eport.portStatus=Constants.AvailabilityStatus.ERROR;
+                        eport.data='/A0'+un+po+'A00000000000~';
+                        return callback(null,eport);
                 }
                 else if(eport.portStatus==Constants.AvailabilityStatus.EMPTY)
                 {

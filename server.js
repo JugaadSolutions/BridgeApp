@@ -13,11 +13,13 @@ setInterval(function(){
             {
                 //console.log(obj);
                 require('./bin/userArray');
+                require('./bin/blacklistUser');
                 require('./bin/eport');
                 require('./bin/eMemberPlans');
                 require('./bin/pbs-bridge');
                 require('./bin/port-communication');
-                //require('./bin/serverbridge');
+                require('./bin/serverbridge');
+                require('./bin/rabbitmq_sub');
                 console.log('All servers Restarted');
                 conn=0;
             }

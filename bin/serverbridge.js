@@ -7,6 +7,8 @@
     require('../app/models/checkin');
 
 var upload = require('./upload-service');
+var ReconsileService = require('../app/services/reconsile-service');
+
 setInterval(function () {
     //console.log('Timeout');
 upload.Checkoutuploader(function (err,result) {
@@ -32,3 +34,15 @@ upload.Checkinuploader(function (err,result) {
 });
 },3000);
 
+//setTimeout(function () {
+setInterval(function () {
+    // console.log('Timeout');
+    ReconsileService.reconcile(function (err,result) {
+        if(err)
+        {
+            console.error('Error reconcilation '+err);
+            //return;
+        }
+
+    });
+},5000);

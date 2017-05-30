@@ -1,13 +1,14 @@
 {
+  "version":"0.8.10",
   "port": "2000",
-  "ipAddress": "13.13.12.1",
-  "stationName":"MCC ZONE-2",
+  "subnet":"15",
+  "blacklistDelay":"3",
   "udp": {
     "port": 6000,
     "host": "0.0.0.0"
   },
   "serverBridge": {
-    "baseUrl": "http://13.13.13.1:13060/api/"
+    "baseUrl": "http://13.13.13.1:13080/api/"
   },
   "db": {
     "host": "localhost",
@@ -15,6 +16,10 @@
     "username": "",
     "password": "",
     "database": "pbs-bridge"
+  },
+  "time":{
+    "from":6,
+    "to":22
   },
   "security": {
     "secret": "heisenbergtheking",
