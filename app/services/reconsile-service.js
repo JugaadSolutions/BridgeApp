@@ -286,7 +286,7 @@ function checkoutprocess(checkindetails,callback) {
                                             update = true;
                                             return callback(null,updatedUser);
                                         });
-                                        // break;
+                                         break;
                                     }
                                 }
                             }
