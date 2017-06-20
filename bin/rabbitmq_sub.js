@@ -1,6 +1,7 @@
-/**
+/*
+/!**
  * Created by root on 21/5/17.
- */
+ *!/
 var Users = require('../app/models/users');
 var Checkout = require('../app/models/checkout');
 var Checkin = require('../app/models/checkin');
@@ -13,6 +14,7 @@ context.on('ready', function() {
     var  vehicleSub = context.socket('SUB');
     var  checkoutSub = context.socket('SUB');
     var  checkinSub = context.socket('SUB');
+
 
     userSub.set
     userSub.connect('users', function() {
@@ -102,23 +104,44 @@ context.on('ready', function() {
             {
                 console.error('Error while updating vehicle for the synced checkout'+err);
             }
-            Users.findOneAndUpdate({UserID:checkoutData.user},{$push:{vehicleId:{vehicleid:vehicleDetails._id,vehicleUid:vehicleDetails.vehicleUid}}},{new:true},function (err,userDetails) {
-                if(err)
-                {
-                    console.error('Error while updating user for the synced checkout'+err);
-                }
-
-                Vehicle.findOneAndUpdate({vehicleUid:vehicleDetails.vehicleUid},{$set:{currentAssociationId:userDetails._id,vehicleCurrentStatus:Constants.VehicleLocationStatus.WITH_MEMBER}},function (err,vehicleDet) {
-                    if (err) {
-                        console.error('Error while updating vehicle for the synced checkout' + err);
+            if(!vehicleDetails)
+            {
+                console.error('Error vehicle is not synced to process this checkout : vehicleUid = '+checkoutData.vehicleId);
+            }
+            else
+            {
+                Users.findOne({UserID:checkoutData.user},function (err,userDet) {
+                    if(err)
+                    {
+                        console.error('Error while finding user for the synced checkout'+err);
                     }
-                    Checkout.create(checkoutData,function (err,result) {
-                        if(err) {
-                            console.error('err while creating checkout. Ignore if it a duplicate entry error ' + err);
-                        }
-                    });
+                    if(!userDet)
+                    {
+                        console.error('Error user is not synced to process this checkout : UserID = '+checkoutData.user);
+                    }
+                    else
+                    {
+                        Users.findByIdAndUpdate(userDet._id,{$push:{vehicleId:{vehicleid:vehicleDetails._id,vehicleUid:vehicleDetails.vehicleUid}}},{new:true},function (err,userDetails) {
+                            if(err)
+                            {
+                                console.error('Error while updating user for the synced checkout'+err);
+                            }
+
+                            Vehicle.findOneAndUpdate({vehicleUid:vehicleDetails.vehicleUid},{$set:{currentAssociationId:userDetails._id,vehicleCurrentStatus:Constants.VehicleLocationStatus.WITH_MEMBER}},function (err,vehicleDet) {
+                                if (err) {
+                                    console.error('Error while updating vehicle for the synced checkout' + err);
+                                }
+                                Checkout.create(checkoutData,function (err,result) {
+                                    if(err) {
+                                        console.error('err while creating checkout. Ignore if it a duplicate entry error ' + err);
+                                    }
+                                });
+                            });
+                        });
+                    }
                 });
-            });
+            }
+
         });
 
     });
@@ -137,4 +160,4 @@ context.on('ready', function() {
 context.on('error', function(e) {
     console.log(e);
    // setInterval(context, 5000);
-});
+});*/

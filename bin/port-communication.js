@@ -325,7 +325,7 @@ var RxQueue = queue(1, function(task, done) {
                     }
                 }
             }
-            if(proceed)
+            /*if(proceed)
             {
                 for(var b=0;b<blacklistArray.length;b++) {
                     if (blacklistArray[b] == result.data.slice(5, 21)) {
@@ -334,7 +334,7 @@ var RxQueue = queue(1, function(task, done) {
                         break;
                     }
                 }
-            }
+            }*/
             if(proceed)
             {
                 for (var i = 0; i < ports.length; i++) {

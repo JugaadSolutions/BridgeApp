@@ -25,7 +25,41 @@ exports.requestHandler = function (httpMethod, uri, requestBody,callback) {
         , function (error, response, body) {
 
             if (error) {
+                tryWan(httpMethod,uri,requestBody,function (err,result) {
+                    if(err)
+                    {
+                        return console.error('Error : Unable to reach Second server');
+                    }
+                    return callback(null,result);
+                });
                // EventLoggersHandler.logger.error(error);
+               // return console.error('Error : Unable to reach server');
+            }
+
+            if (body) {
+                if (body.description) {
+                    EventLoggersHandler.logger.info("Response from Admin API: " + body.description);
+                }
+                return callback(null,body.data);
+            }
+
+        }
+    )
+};
+
+function tryWan(httpMethod,uri,requestBody,callback) {
+    req(
+        {
+            method: httpMethod,
+            baseUrl: config.get('serverBridge.fallbackUrl'),
+            uri: uri,
+            json: true,
+            body:requestBody
+        }
+        , function (error, response, body) {
+
+            if (error) {
+                // EventLoggersHandler.logger.error(error);
                 return console.error('Error : Unable to reach server');
             }
 
@@ -38,5 +72,4 @@ exports.requestHandler = function (httpMethod, uri, requestBody,callback) {
 
         }
     )
-
-};
+}

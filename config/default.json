@@ -1,25 +1,26 @@
 {
-  "version":"0.8.10",
+  "version":"0.9.00",
   "port": "2000",
-  "subnet":"15",
+  "subnet":"41",
   "blacklistDelay":"3",
   "udp": {
     "port": 6000,
     "host": "0.0.0.0"
   },
   "serverBridge": {
-    "baseUrl": "http://13.13.13.1:13080/api/"
+    "baseUrl": "http://13.13.13.1:13080/api/",
+    "fallbackUrl": "http://43.251.80.79:13080/api/"
   },
   "db": {
     "host": "localhost",
     "port": 27017,
     "username": "",
     "password": "",
-    "database": "pbs-bridge"
+    "database": "pbs-sync"
   },
   "time":{
     "from":6,
-    "to":22
+    "to":20
   },
   "security": {
     "secret": "heisenbergtheking",

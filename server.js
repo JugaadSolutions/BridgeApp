@@ -9,6 +9,7 @@ setInterval(function(){
         }
         if(obj)
         {
+
             if(conn==1)
             {
                 //console.log(obj);
@@ -19,7 +20,8 @@ setInterval(function(){
                 require('./bin/pbs-bridge');
                 require('./bin/port-communication');
                 require('./bin/serverbridge');
-                require('./bin/rabbitmq_sub');
+                //require('./bin/rabbitmq_sub');
+                require('./bin/rabbitEasy_sub');
                 console.log('All servers Restarted');
                 conn=0;
             }
